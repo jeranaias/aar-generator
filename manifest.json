@@ -2,7 +2,8 @@
   "name": "After Action Report Generator",
   "short_name": "AAR Generator",
   "description": "Generate properly formatted After Action Reports following USMC TECOM format with MCCLL-compatible structure",
-  "start_url": "/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#8B0000",
   "theme_color": "#8B0000",
@@ -19,6 +20,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ],
   "categories": ["productivity", "utilities"],

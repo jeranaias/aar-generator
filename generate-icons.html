@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate PWA Icons</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    canvas { border: 1px solid #ccc; margin: 10px; }
+    .download-btn { margin: 10px; padding: 10px 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>AAR Generator - Icon Generator</h1>
+  <p>Click buttons to download icons:</p>
+
+  <div>
+    <canvas id="icon192" width="192" height="192"></canvas>
+    <canvas id="icon512" width="512" height="512"></canvas>
+  </div>
+
+  <button class="download-btn" onclick="download('icon192', 'icon-192.png')">Download 192x192</button>
+  <button class="download-btn" onclick="download('icon512', 'icon-512.png')">Download 512x512</button>
+
+  <script>
+    function drawIcon(canvas) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const scale = size / 512;
+
+      // Background gradient
+      const grad = ctx.createLinearGradient(0, 0, size, size);
+      grad.addColorStop(0, '#8B0000');
+      grad.addColorStop(1, '#6B0000');
+
+      // Circle background
+      ctx.beginPath();
+      ctx.arc(size/2, size/2, size * 0.47, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Document
+      ctx.fillStyle = '#FFFFFF';
+      roundRect(ctx, 140*scale, 80*scale, 232*scale, 300*scale, 8*scale);
+      ctx.fill();
+
+      // Document lines
+      ctx.fillStyle = '#8B0000';
+      roundRect(ctx, 170*scale, 160*scale, 172*scale, 12*scale, 2*scale);
+      ctx.fill();
+
+      ctx.fillStyle = '#9CA3AF';
+      [190, 210, 230, 280, 300, 320].forEach((y, i) => {
+        const width = [140, 160, 120, 150, 172, 130][i];
+        roundRect(ctx, 170*scale, y*scale, width*scale, 8*scale, 2*scale);
+        ctx.fill();
+      });
+
+      // Divider
+      ctx.fillStyle = '#E5E7EB';
+      ctx.fillRect(170*scale, 260*scale, 172*scale, 2*scale);
+
+      // AAR Badge
+      ctx.beginPath();
+      ctx.arc(380*scale, 380*scale, 80*scale, 0, Math.PI * 2);
+      ctx.fillStyle = '#003366';
+      ctx.fill();
+
+      // AAR Text
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `bold ${48*scale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('AAR', 380*scale, 385*scale);
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function download(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Draw both icons
+    drawIcon(document.getElementById('icon192'));
+    drawIcon(document.getElementById('icon512'));
+  </script>
+</body>
+</html>

@@ -4,19 +4,22 @@
  */
 
 const CACHE_NAME = 'aar-generator-v1';
+
+// Use relative URLs for GitHub Pages compatibility
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/aar-builder.js',
-  '/js/export.js',
-  '/js/lib/theme.js',
-  '/js/lib/storage.js',
-  '/js/lib/date-utils.js',
-  '/assets/icon-192.png',
-  '/assets/icon-512.png',
-  '/manifest.json'
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/app.js',
+  './js/aar-builder.js',
+  './js/export.js',
+  './js/lib/theme.js',
+  './js/lib/storage.js',
+  './js/lib/date-utils.js',
+  './assets/icon-192.png',
+  './assets/icon-512.png',
+  './assets/icon.svg',
+  './manifest.json'
 ];
 
 // Install event - cache assets
@@ -24,11 +27,11 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Opened cache');
+        console.log('AAR Generator: Caching assets');
         return cache.addAll(urlsToCache);
       })
       .catch((err) => {
-        console.error('Cache install failed:', err);
+        console.error('AAR Generator: Cache install failed:', err);
       })
   );
   // Activate immediately
@@ -40,12 +43,12 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
+        cacheNames
+          .filter((cacheName) => cacheName.startsWith('aar-generator-') && cacheName !== CACHE_NAME)
+          .map((cacheName) => {
+            console.log('AAR Generator: Deleting old cache:', cacheName);
             return caches.delete(cacheName);
-          }
-        })
+          })
       );
     })
   );
@@ -55,6 +58,11 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  // Only handle same-origin requests
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -87,7 +95,7 @@ self.addEventListener('fetch', (event) => {
           .catch(() => {
             // Offline fallback - return cached index.html for navigation
             if (event.request.mode === 'navigate') {
-              return caches.match('/index.html');
+              return caches.match('./index.html');
             }
           });
       })
