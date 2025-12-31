@@ -1,0 +1,17 @@
+# Spec files (local reference only)
+BUILD_SPEC.md
+DESIGN_SYSTEM.md
+CLAUDE_CODE_PROMPT.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Node (if added later)
+node_modules/
