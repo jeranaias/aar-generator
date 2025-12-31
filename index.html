@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Generate properly formatted After Action Reports following USMC TECOM format with MCCLL-compatible structure">
+  <title>AAR Generator - USMC Tools</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8B0000">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Skip Link - Accessibility -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="header no-print">
+    <div class="container">
+      <h1 class="header__title">After Action Report Generator</h1>
+      <p class="header__subtitle">TECOM Format with MCCLL-compatible structure</p>
+      <button type="button" id="theme-toggle" class="btn btn--ghost theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon">&#9788;</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main" class="container">
+    <form id="aar-form" class="aar-form">
+
+      <!-- Section 1: Unit Information -->
+      <section class="card form-section">
+        <div class="card__header">
+          <h2 class="card__title">Unit Information</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group form-group--full">
+            <label for="unitName" class="label label--required">Unit Name</label>
+            <input type="text" id="unitName" class="input" placeholder="e.g., 1ST BATTALION, 5TH MARINES" required>
+            <p class="help-text">Full unit designation in all caps</p>
+          </div>
+          <div class="form-group form-group--full">
+            <label for="unitAddress1" class="label">Address Line 1</label>
+            <input type="text" id="unitAddress1" class="input" placeholder="e.g., BOX 555500">
+          </div>
+          <div class="form-group form-group--full">
+            <label for="unitAddress2" class="label">Address Line 2</label>
+            <input type="text" id="unitAddress2" class="input" placeholder="e.g., CAMP PENDLETON CA 92055">
+          </div>
+          <div class="form-group">
+            <label for="ssic" class="label">SSIC</label>
+            <input type="text" id="ssic" class="input" value="3504" placeholder="3504">
+            <p class="help-text">Standard Subject Identification Code (default: 3504 for training/lessons learned)</p>
+          </div>
+          <div class="form-group">
+            <label for="officeCode" class="label">Office Code</label>
+            <input type="text" id="officeCode" class="input" placeholder="e.g., S-3">
+          </div>
+          <div class="form-group">
+            <label for="documentDate" class="label label--required">Document Date</label>
+            <input type="date" id="documentDate" class="input" required>
+            <p class="help-text">Will format as DD MMM YY</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: From / To -->
+      <section class="card form-section">
+        <div class="card__header">
+          <h2 class="card__title">From / To</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="fromRank" class="label label--required">From Rank</label>
+            <select id="fromRank" class="input select" required>
+              <option value="">Select Rank</option>
+              <optgroup label="Enlisted">
+                <option value="Pvt">Pvt</option>
+                <option value="PFC">PFC</option>
+                <option value="LCpl">LCpl</option>
+                <option value="Cpl">Cpl</option>
+                <option value="Sgt">Sgt</option>
+                <option value="SSgt">SSgt</option>
+                <option value="GySgt">GySgt</option>
+                <option value="MSgt">MSgt</option>
+                <option value="1stSgt">1stSgt</option>
+                <option value="MGySgt">MGySgt</option>
+                <option value="SgtMaj">SgtMaj</option>
+              </optgroup>
+              <optgroup label="Warrant Officer">
+                <option value="WO">WO</option>
+                <option value="CWO2">CWO2</option>
+                <option value="CWO3">CWO3</option>
+                <option value="CWO4">CWO4</option>
+                <option value="CWO5">CWO5</option>
+              </optgroup>
+              <optgroup label="Officer">
+                <option value="2ndLt">2ndLt</option>
+                <option value="1stLt">1stLt</option>
+                <option value="Capt">Capt</option>
+                <option value="Maj">Maj</option>
+                <option value="LtCol">LtCol</option>
+                <option value="Col">Col</option>
+                <option value="BGen">BGen</option>
+                <option value="MajGen">MajGen</option>
+                <option value="LtGen">LtGen</option>
+                <option value="Gen">Gen</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fromName" class="label label--required">From Name</label>
+            <input type="text" id="fromName" class="input" placeholder="e.g., John A Smith" required>
+            <p class="help-text">First MI Last format</p>
+          </div>
+          <div class="form-group form-group--full">
+            <label for="fromBillet" class="label label--required">From Billet</label>
+            <input type="text" id="fromBillet" class="input" placeholder="e.g., Training Officer" required>
+          </div>
+          <div class="form-group form-group--full">
+            <label for="toTitle" class="label label--required">To</label>
+            <input type="text" id="toTitle" class="input" value="Operations Officer" placeholder="e.g., Operations Officer" required>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Event Details -->
+      <section class="card form-section">
+        <div class="card__header">
+          <h2 class="card__title">Event Details</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group form-group--full">
+            <label for="eventName" class="label label--required">Event Name</label>
+            <input type="text" id="eventName" class="input" placeholder="e.g., LIVE FIRE RANGE 400" required>
+            <p class="help-text">Uppercase event name for subject line</p>
+          </div>
+          <div class="form-group">
+            <label for="eventStartDate" class="label label--required">Start Date</label>
+            <input type="date" id="eventStartDate" class="input" required>
+          </div>
+          <div class="form-group">
+            <label for="eventEndDate" class="label label--required">End Date</label>
+            <input type="date" id="eventEndDate" class="input" required>
+          </div>
+        </div>
+        <div class="subject-preview">
+          <p class="label">Subject Line Preview:</p>
+          <div class="preview-box" id="subjectPreview">
+            AFTER ACTION REPORT FOR [EVENT] CONDUCTED FROM [START] TO [END]
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: IMPROVE Topics -->
+      <section class="card form-section">
+        <div class="card__header">
+          <h2 class="card__title">1. IMPROVE</h2>
+          <p class="card__subtitle">Areas that need improvement</p>
+        </div>
+
+        <div class="guided-prompts">
+          <p class="text-sm"><strong>Prompts to consider:</strong></p>
+          <ul class="prompt-list">
+            <li>What happened? (specific incident/observation)</li>
+            <li>When/where did it occur? (phase, location)</li>
+            <li>Who was affected? (individuals, sections, unit)</li>
+            <li>What was the impact? (mission, safety, efficiency)</li>
+          </ul>
+        </div>
+
+        <div id="improveTopics" class="topics-container">
+          <!-- Topics will be added dynamically -->
+        </div>
+
+        <button type="button" id="addImprove" class="btn btn--outline btn--full mt-4">
+          + Add Improve Topic
+        </button>
+      </section>
+
+      <!-- Section 5: SUSTAIN Topics -->
+      <section class="card form-section">
+        <div class="card__header">
+          <h2 class="card__title">2. SUSTAIN</h2>
+          <p class="card__subtitle">Areas that were effective and should continue</p>
+        </div>
+
+        <div class="guided-prompts">
+          <p class="text-sm"><strong>Prompts to consider:</strong></p>
+          <ul class="prompt-list">
+            <li>What worked well?</li>
+            <li>How did it contribute to mission success?</li>
+            <li>What made it effective?</li>
+            <li>Can it be replicated/scaled?</li>
+          </ul>
+        </div>
+
+        <div id="sustainTopics" class="topics-container">
+          <!-- Topics will be added dynamically -->
+        </div>
+
+        <button type="button" id="addSustain" class="btn btn--outline btn--full mt-4">
+          + Add Sustain Topic
+        </button>
+      </section>
+
+      <!-- Section 6: POC & Signature -->
+      <section class="card form-section">
+        <div class="card__header">
+          <h2 class="card__title">Point of Contact</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="pocRank" class="label label--required">POC Rank</label>
+            <select id="pocRank" class="input select" required>
+              <option value="">Select Rank</option>
+              <optgroup label="Enlisted">
+                <option value="Pvt">Pvt</option>
+                <option value="PFC">PFC</option>
+                <option value="LCpl">LCpl</option>
+                <option value="Cpl">Cpl</option>
+                <option value="Sgt">Sgt</option>
+                <option value="SSgt">SSgt</option>
+                <option value="GySgt">GySgt</option>
+                <option value="MSgt">MSgt</option>
+                <option value="1stSgt">1stSgt</option>
+                <option value="MGySgt">MGySgt</option>
+                <option value="SgtMaj">SgtMaj</option>
+              </optgroup>
+              <optgroup label="Warrant Officer">
+                <option value="WO">WO</option>
+                <option value="CWO2">CWO2</option>
+                <option value="CWO3">CWO3</option>
+                <option value="CWO4">CWO4</option>
+                <option value="CWO5">CWO5</option>
+              </optgroup>
+              <optgroup label="Officer">
+                <option value="2ndLt">2ndLt</option>
+                <option value="1stLt">1stLt</option>
+                <option value="Capt">Capt</option>
+                <option value="Maj">Maj</option>
+                <option value="LtCol">LtCol</option>
+                <option value="Col">Col</option>
+                <option value="BGen">BGen</option>
+                <option value="MajGen">MajGen</option>
+                <option value="LtGen">LtGen</option>
+                <option value="Gen">Gen</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pocName" class="label label--required">POC Name</label>
+            <input type="text" id="pocName" class="input" placeholder="e.g., John A Smith" required>
+          </div>
+          <div class="form-group">
+            <label for="pocPhone" class="label label--required">Phone</label>
+            <input type="tel" id="pocPhone" class="input" placeholder="(XXX) XXX-XXXX" required>
+          </div>
+          <div class="form-group">
+            <label for="pocEmail" class="label label--required">Email</label>
+            <input type="email" id="pocEmail" class="input" placeholder="name@usmc.mil" required>
+          </div>
+        </div>
+
+        <div class="card__header mt-4">
+          <h2 class="card__title">Signature Block</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group form-group--full">
+            <label for="signatureName" class="label label--required">Signature Name</label>
+            <input type="text" id="signatureName" class="input" placeholder="e.g., J. A. SMITH" required>
+            <p class="help-text">Initials and last name in caps (e.g., J. A. SMITH)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 7: Actions -->
+      <section class="card form-section actions-section no-print">
+        <div class="action-buttons">
+          <div class="action-group">
+            <button type="button" id="previewBtn" class="btn btn--secondary">
+              Preview
+            </button>
+            <button type="button" id="copyBtn" class="btn btn--primary">
+              Copy to Clipboard
+            </button>
+            <button type="button" id="exportDocxBtn" class="btn btn--primary">
+              Export DOCX
+            </button>
+          </div>
+          <div class="action-group">
+            <button type="button" id="saveDraftBtn" class="btn btn--outline">
+              Save Draft
+            </button>
+            <button type="button" id="loadDraftBtn" class="btn btn--outline">
+              Load Draft
+            </button>
+            <button type="button" id="clearAllBtn" class="btn btn--ghost">
+              Clear All
+            </button>
+          </div>
+        </div>
+      </section>
+    </form>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="previewModal">
+      <div class="modal modal--large">
+        <div class="modal__header">
+          <h2 class="modal__title">AAR Preview</h2>
+          <button type="button" class="btn btn--ghost modal__close" id="closePreview">&times;</button>
+        </div>
+        <div class="modal__body">
+          <pre id="previewContent" class="preview-content"></pre>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--outline" id="printPreview">Print</button>
+          <button type="button" class="btn btn--primary" id="copyFromPreview">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+      <span class="toast__message" id="toastMessage"></span>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer no-print">
+    <div class="container">
+      <p class="text-sm text-secondary text-center">
+        Free and open source. <a href="https://github.com/jeranaias/aar-generator">View on GitHub</a>
+      </p>
+      <p class="text-sm text-secondary text-center mt-4">
+        Part of the <a href="https://jeranaias.github.io/usmc-tools/">USMC Tools</a> suite.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Topic Template -->
+  <template id="topicTemplate">
+    <div class="topic-card" data-topic-id="">
+      <div class="topic-header">
+        <span class="topic-label">Topic <span class="topic-letter"></span></span>
+        <button type="button" class="btn btn--ghost btn--sm remove-topic" aria-label="Remove topic">
+          &times; Remove
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="label label--required">Topic</label>
+        <input type="text" class="input topic-title" placeholder="One line description of the topic" maxlength="60">
+        <div class="char-counter"><span class="char-count">0</span>/60</div>
+      </div>
+      <div class="form-group">
+        <label class="label label--required">Discussion</label>
+        <textarea class="input textarea topic-discussion" placeholder="Provide background information and pertinent details about the topic"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="label label--required">Recommendation</label>
+        <textarea class="input textarea topic-recommendation" placeholder="Recommendations or follow-on actions (specific, evidence-based, relevant, reasonable)"></textarea>
+      </div>
+    </div>
+  </template>
+
+  <!-- Scripts -->
+  <script src="js/lib/theme.js"></script>
+  <script src="js/lib/storage.js"></script>
+  <script src="js/lib/date-utils.js"></script>
+  <script src="js/aar-builder.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
