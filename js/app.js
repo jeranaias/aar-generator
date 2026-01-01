@@ -4,8 +4,11 @@
  */
 const AARApp = {
   STORAGE_KEY: 'aar-generator-draft',
+  PREVIEW_KEY: 'aar-generator-preview-enabled',
   topicIdCounter: 0,
   previewDebounceTimer: null,
+  previewEnabled: false,
+  currentBlobUrl: null,
 
   /**
    * Initialize the application
@@ -16,7 +19,7 @@ const AARApp = {
     this.addInitialTopics();
     this.setDefaultDates();
     this.loadDraft();
-    this.updateLivePreview();
+    this.loadPreviewPreference();
   },
 
   /**
@@ -27,8 +30,12 @@ const AARApp = {
     this.improveContainer = document.getElementById('improveTopics');
     this.sustainContainer = document.getElementById('sustainTopics');
     this.topicTemplate = document.getElementById('topicTemplate');
-    this.previewContent = document.getElementById('previewContent');
-    this.previewPanel = document.getElementById('previewPanel');
+    this.container = document.querySelector('.container');
+    this.previewPane = document.getElementById('livePreviewPane');
+    this.previewFrame = document.getElementById('previewFrame');
+    this.previewLoading = document.getElementById('previewLoading');
+    this.previewToggleBtn = document.getElementById('previewToggle');
+    this.previewCloseBtn = document.getElementById('previewClose');
     this.toast = document.getElementById('toast');
     this.toastMessage = document.getElementById('toastMessage');
   },
@@ -40,19 +47,17 @@ const AARApp = {
     // Theme toggle
     document.getElementById('theme-toggle')?.addEventListener('click', () => ThemeManager.toggle());
 
-    // Preview toggle (mobile)
-    document.getElementById('toggle-preview')?.addEventListener('click', () => this.togglePreview());
+    // Preview toggle buttons
+    this.previewToggleBtn?.addEventListener('click', () => this.toggleLivePreview());
+    this.previewCloseBtn?.addEventListener('click', () => this.toggleLivePreview(false));
 
     // Add topic buttons
     document.getElementById('addImprove').addEventListener('click', () => this.addTopic('improve'));
     document.getElementById('addSustain').addEventListener('click', () => this.addTopic('sustain'));
 
-    // Export buttons (both sets)
+    // Export buttons
     document.getElementById('exportPdfBtn')?.addEventListener('click', () => this.exportPDF());
-    document.getElementById('exportPdfBtn2')?.addEventListener('click', () => this.exportPDF());
     document.getElementById('copyBtn')?.addEventListener('click', () => this.copyToClipboard());
-    document.getElementById('copyBtn2')?.addEventListener('click', () => this.copyToClipboard());
-    document.getElementById('printBtn')?.addEventListener('click', () => this.printAAR());
 
     // Draft buttons
     document.getElementById('saveDraftBtn')?.addEventListener('click', () => this.saveDraft());
@@ -68,17 +73,39 @@ const AARApp = {
   },
 
   /**
-   * Toggle preview panel visibility (mobile)
+   * Load preview preference from localStorage
    */
-  togglePreview() {
-    this.previewPanel.classList.toggle('hidden');
-    const btn = document.getElementById('toggle-preview');
-    const icon = btn.querySelector('.preview-icon');
-    if (this.previewPanel.classList.contains('hidden')) {
-      icon.innerHTML = '&#9744;'; // Empty checkbox
-    } else {
-      icon.innerHTML = '&#9745;'; // Checked checkbox
+  loadPreviewPreference() {
+    const saved = localStorage.getItem(this.PREVIEW_KEY);
+    if (saved === 'true') {
+      this.toggleLivePreview(true);
     }
+  },
+
+  /**
+   * Toggle live preview pane
+   */
+  toggleLivePreview(forceState = null) {
+    this.previewEnabled = forceState !== null ? forceState : !this.previewEnabled;
+
+    if (this.previewEnabled) {
+      this.previewPane.classList.add('show');
+      this.container.classList.add('preview-active');
+      this.previewToggleBtn.textContent = 'Hide Preview';
+      this.updateLivePreview();
+    } else {
+      this.previewPane.classList.remove('show');
+      this.container.classList.remove('preview-active');
+      this.previewToggleBtn.textContent = 'Live Preview';
+      // Clean up blob URL when closing
+      if (this.currentBlobUrl) {
+        URL.revokeObjectURL(this.currentBlobUrl);
+        this.currentBlobUrl = null;
+      }
+    }
+
+    // Save preference
+    localStorage.setItem(this.PREVIEW_KEY, this.previewEnabled.toString());
   },
 
   /**
@@ -89,16 +116,42 @@ const AARApp = {
     this.previewDebounceTimer = setTimeout(() => {
       this.updateLivePreview();
       this.autoSave();
-    }, 150);
+    }, 750);
   },
 
   /**
-   * Update live preview
+   * Update live preview with PDF blob
    */
   updateLivePreview() {
-    const data = this.gatherFormData();
-    const content = AARBuilder.generate(data);
-    this.previewContent.textContent = content;
+    if (!this.previewEnabled) return;
+
+    try {
+      // Show loading spinner
+      if (this.previewLoading) {
+        this.previewLoading.classList.add('show');
+      }
+
+      const data = this.gatherFormData();
+      const pdfBlob = PDFGenerator.generateBlob(data);
+
+      if (pdfBlob) {
+        // Revoke old blob URL to prevent memory leaks
+        if (this.currentBlobUrl) {
+          URL.revokeObjectURL(this.currentBlobUrl);
+        }
+
+        // Create new blob URL and set iframe src
+        this.currentBlobUrl = URL.createObjectURL(pdfBlob);
+        this.previewFrame.src = this.currentBlobUrl;
+      }
+    } catch (err) {
+      console.error('Preview generation error:', err);
+    } finally {
+      // Hide loading spinner
+      if (this.previewLoading) {
+        this.previewLoading.classList.remove('show');
+      }
+    }
   },
 
   /**
@@ -299,13 +352,6 @@ const AARApp = {
   },
 
   /**
-   * Print AAR
-   */
-  printAAR() {
-    window.print();
-  },
-
-  /**
    * Save draft
    */
   saveDraft() {
@@ -386,7 +432,7 @@ const AARApp = {
       this.addTopic('sustain');
     }
 
-    this.updateLivePreview();
+    this.schedulePreviewUpdate();
   },
 
   /**
@@ -404,7 +450,7 @@ const AARApp = {
     document.getElementById('ssic').value = '3504';
     document.getElementById('toTitle').value = 'Operations Officer';
     Storage.remove(this.STORAGE_KEY);
-    this.updateLivePreview();
+    this.schedulePreviewUpdate();
     this.showToast('Form cleared', 'success');
   },
 

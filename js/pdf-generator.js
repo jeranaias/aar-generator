@@ -38,7 +38,6 @@ const PDFGenerator = {
 
     const lineHeight = this.FONT.size * this.FONT.lineHeight / 72; // Convert points to inches
     const pageWidth = this.PAGE.width - this.PAGE.marginLeft - this.PAGE.marginRight;
-    const charsPerLine = Math.floor(pageWidth * 10); // Approximate chars per line
 
     let y = this.PAGE.marginTop;
     const x = this.PAGE.marginLeft;
@@ -179,6 +178,16 @@ const PDFGenerator = {
       return data.fromBillet;
     }
     return parts.join(' ') || '[FROM]';
+  },
+
+  /**
+   * Generate PDF as Blob for preview
+   * @param {Object} data - AAR form data
+   * @returns {Blob} PDF blob
+   */
+  generateBlob(data) {
+    const doc = this.generate(data);
+    return doc.output('blob');
   },
 
   /**
