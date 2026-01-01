@@ -1,6 +1,6 @@
 /**
  * AAR Generator - Main Application
- * Handles form interactions, live preview, and exports
+ * Handles form interactions, drag-drop, live preview, and exports
  */
 const AARApp = {
   STORAGE_KEY: 'aar-generator-draft',
@@ -9,6 +9,7 @@ const AARApp = {
   previewDebounceTimer: null,
   previewEnabled: false,
   currentBlobUrl: null,
+  draggedElement: null,
 
   /**
    * Initialize the application
@@ -30,7 +31,7 @@ const AARApp = {
     this.improveContainer = document.getElementById('improveTopics');
     this.sustainContainer = document.getElementById('sustainTopics');
     this.topicTemplate = document.getElementById('topicTemplate');
-    this.container = document.querySelector('.container');
+    this.mainContent = document.querySelector('.main-content');
     this.previewPane = document.getElementById('livePreviewPane');
     this.previewFrame = document.getElementById('previewFrame');
     this.previewLoading = document.getElementById('previewLoading');
@@ -57,6 +58,7 @@ const AARApp = {
 
     // Export buttons
     document.getElementById('exportPdfBtn')?.addEventListener('click', () => this.exportPDF());
+    document.getElementById('exportWordBtn')?.addEventListener('click', () => this.exportWord());
     document.getElementById('copyBtn')?.addEventListener('click', () => this.copyToClipboard());
 
     // Draft buttons
@@ -70,6 +72,104 @@ const AARApp = {
     // Live preview updates - listen to all form inputs
     this.form.addEventListener('input', () => this.schedulePreviewUpdate());
     this.form.addEventListener('change', () => this.schedulePreviewUpdate());
+
+    // Drag and drop for topic containers
+    this.setupDragDrop(this.improveContainer, 'improve');
+    this.setupDragDrop(this.sustainContainer, 'sustain');
+  },
+
+  /**
+   * Setup drag and drop for a container
+   */
+  setupDragDrop(container, type) {
+    container.addEventListener('dragstart', (e) => this.handleDragStart(e));
+    container.addEventListener('dragend', (e) => this.handleDragEnd(e));
+    container.addEventListener('dragover', (e) => this.handleDragOver(e));
+    container.addEventListener('dragenter', (e) => this.handleDragEnter(e));
+    container.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+    container.addEventListener('drop', (e) => this.handleDrop(e, type));
+  },
+
+  /**
+   * Handle drag start
+   */
+  handleDragStart(e) {
+    if (!e.target.classList.contains('topic-card')) return;
+
+    this.draggedElement = e.target;
+    e.target.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', e.target.dataset.topicId);
+  },
+
+  /**
+   * Handle drag end
+   */
+  handleDragEnd(e) {
+    if (!e.target.classList.contains('topic-card')) return;
+
+    e.target.classList.remove('dragging');
+    this.draggedElement = null;
+
+    // Remove all drag-over classes
+    document.querySelectorAll('.topic-card.drag-over').forEach(el => {
+      el.classList.remove('drag-over');
+    });
+  },
+
+  /**
+   * Handle drag over
+   */
+  handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  },
+
+  /**
+   * Handle drag enter
+   */
+  handleDragEnter(e) {
+    const target = e.target.closest('.topic-card');
+    if (target && target !== this.draggedElement) {
+      target.classList.add('drag-over');
+    }
+  },
+
+  /**
+   * Handle drag leave
+   */
+  handleDragLeave(e) {
+    const target = e.target.closest('.topic-card');
+    if (target) {
+      target.classList.remove('drag-over');
+    }
+  },
+
+  /**
+   * Handle drop
+   */
+  handleDrop(e, type) {
+    e.preventDefault();
+
+    const target = e.target.closest('.topic-card');
+    if (!target || !this.draggedElement || target === this.draggedElement) return;
+
+    target.classList.remove('drag-over');
+
+    const container = type === 'improve' ? this.improveContainer : this.sustainContainer;
+    const cards = Array.from(container.querySelectorAll('.topic-card'));
+    const draggedIndex = cards.indexOf(this.draggedElement);
+    const targetIndex = cards.indexOf(target);
+
+    if (draggedIndex < targetIndex) {
+      target.parentNode.insertBefore(this.draggedElement, target.nextSibling);
+    } else {
+      target.parentNode.insertBefore(this.draggedElement, target);
+    }
+
+    this.updateTopicLetters(type);
+    this.schedulePreviewUpdate();
+    this.showToast('Topic reordered', 'info');
   },
 
   /**
@@ -90,13 +190,15 @@ const AARApp = {
 
     if (this.previewEnabled) {
       this.previewPane.classList.add('show');
-      this.container.classList.add('preview-active');
-      this.previewToggleBtn.textContent = 'Hide Preview';
+      this.mainContent.classList.add('preview-active');
+      this.previewToggleBtn.classList.add('active');
+      this.previewToggleBtn.setAttribute('aria-pressed', 'true');
       this.updateLivePreview();
     } else {
       this.previewPane.classList.remove('show');
-      this.container.classList.remove('preview-active');
-      this.previewToggleBtn.textContent = 'Live Preview';
+      this.mainContent.classList.remove('preview-active');
+      this.previewToggleBtn.classList.remove('active');
+      this.previewToggleBtn.setAttribute('aria-pressed', 'false');
       // Clean up blob URL when closing
       if (this.currentBlobUrl) {
         URL.revokeObjectURL(this.currentBlobUrl);
@@ -147,10 +249,12 @@ const AARApp = {
     } catch (err) {
       console.error('Preview generation error:', err);
     } finally {
-      // Hide loading spinner
-      if (this.previewLoading) {
-        this.previewLoading.classList.remove('show');
-      }
+      // Hide loading spinner after a short delay
+      setTimeout(() => {
+        if (this.previewLoading) {
+          this.previewLoading.classList.remove('show');
+        }
+      }, 200);
     }
   },
 
@@ -189,14 +293,16 @@ const AARApp = {
     const letter = String.fromCharCode(65 + existingTopics.length);
     card.querySelector('.topic-letter').textContent = letter;
 
+    // Remove button
     card.querySelector('.remove-topic').addEventListener('click', () => {
       this.removeTopic(card, type);
     });
 
+    // Character counter for title
     const titleInput = card.querySelector('.topic-title');
     const charCounter = card.querySelector('.char-counter');
     titleInput.addEventListener('input', () => {
-      this.updateCharCounter(titleInput, charCounter, 60);
+      this.updateCharCounter(titleInput, charCounter, 100);
       this.schedulePreviewUpdate();
     });
 
@@ -204,11 +310,12 @@ const AARApp = {
     card.querySelector('.topic-discussion').addEventListener('input', () => this.schedulePreviewUpdate());
     card.querySelector('.topic-recommendation').addEventListener('input', () => this.schedulePreviewUpdate());
 
+    // Populate with data if provided
     if (data) {
       titleInput.value = data.topic || '';
       card.querySelector('.topic-discussion').value = data.discussion || '';
       card.querySelector('.topic-recommendation').value = data.recommendation || '';
-      this.updateCharCounter(titleInput, charCounter, 60);
+      this.updateCharCounter(titleInput, charCounter, 100);
     }
 
     container.appendChild(card);
@@ -234,7 +341,7 @@ const AARApp = {
   },
 
   /**
-   * Update topic letters
+   * Update topic letters after reorder or removal
    */
   updateTopicLetters(type) {
     const container = type === 'improve' ? this.improveContainer : this.sustainContainer;
@@ -259,7 +366,7 @@ const AARApp = {
   },
 
   /**
-   * Format phone number
+   * Format phone number as user types
    */
   formatPhoneNumber(input) {
     let value = input.value.replace(/\D/g, '');
@@ -276,7 +383,7 @@ const AARApp = {
   },
 
   /**
-   * Gather form data
+   * Gather all form data
    */
   gatherFormData() {
     return {
@@ -304,7 +411,7 @@ const AARApp = {
   },
 
   /**
-   * Gather topics
+   * Gather topics from a container
    */
   gatherTopics(type) {
     const container = type === 'improve' ? this.improveContainer : this.sustainContainer;
@@ -324,13 +431,13 @@ const AARApp = {
   },
 
   /**
-   * Export PDF
+   * Export to PDF
    */
   exportPDF() {
     try {
       const data = this.gatherFormData();
       PDFGenerator.exportPDF(data);
-      this.showToast('PDF exported!', 'success');
+      this.showToast('PDF exported successfully!', 'success');
     } catch (err) {
       console.error('PDF export error:', err);
       this.showToast('Failed to export PDF', 'error');
@@ -338,7 +445,21 @@ const AARApp = {
   },
 
   /**
-   * Copy to clipboard
+   * Export to Word
+   */
+  async exportWord() {
+    try {
+      const data = this.gatherFormData();
+      await DOCXGenerator.exportDOCX(data);
+      this.showToast('Word document exported!', 'success');
+    } catch (err) {
+      console.error('Word export error:', err);
+      this.showToast('Failed to export Word document', 'error');
+    }
+  },
+
+  /**
+   * Copy plain text to clipboard
    */
   async copyToClipboard() {
     const data = this.gatherFormData();
@@ -352,7 +473,7 @@ const AARApp = {
   },
 
   /**
-   * Save draft
+   * Save draft to localStorage
    */
   saveDraft() {
     const data = this.gatherFormData();
@@ -360,12 +481,12 @@ const AARApp = {
     if (success) {
       this.showToast('Draft saved!', 'success');
     } else {
-      this.showToast('Failed to save', 'error');
+      this.showToast('Failed to save draft', 'error');
     }
   },
 
   /**
-   * Auto-save
+   * Auto-save (silent)
    */
   autoSave() {
     const data = this.gatherFormData();
@@ -373,7 +494,7 @@ const AARApp = {
   },
 
   /**
-   * Load draft prompt
+   * Prompt user to load draft
    */
   loadDraftPrompt() {
     const draft = Storage.load(this.STORAGE_KEY);
@@ -389,7 +510,7 @@ const AARApp = {
   },
 
   /**
-   * Load draft on init
+   * Load draft on initialization
    */
   loadDraft() {
     const draft = Storage.load(this.STORAGE_KEY);
@@ -399,7 +520,7 @@ const AARApp = {
   },
 
   /**
-   * Populate form with data
+   * Populate form with saved data
    */
   populateForm(data) {
     const fields = [
@@ -436,7 +557,7 @@ const AARApp = {
   },
 
   /**
-   * Clear all
+   * Clear all form data
    */
   clearAll() {
     if (!confirm('Clear all form data? This cannot be undone.')) return;
@@ -455,16 +576,16 @@ const AARApp = {
   },
 
   /**
-   * Show toast
+   * Show toast notification
    */
   showToast(message, type = 'success') {
     this.toastMessage.textContent = message;
-    this.toast.classList.remove('toast--success', 'toast--error');
+    this.toast.classList.remove('toast--success', 'toast--error', 'toast--info');
     this.toast.classList.add(`toast--${type}`);
     this.toast.classList.add('toast--visible');
     setTimeout(() => this.toast.classList.remove('toast--visible'), 3000);
   }
 };
 
-// Initialize
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => AARApp.init());

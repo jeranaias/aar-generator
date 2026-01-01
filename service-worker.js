@@ -3,7 +3,7 @@
  * Enables offline functionality
  */
 
-const CACHE_NAME = 'aar-generator-v3';
+const CACHE_NAME = 'aar-generator-v4';
 
 // Use relative URLs for GitHub Pages compatibility
 const urlsToCache = [
@@ -14,6 +14,7 @@ const urlsToCache = [
   './js/aar-builder.js',
   './js/pdf-generator.js',
   './js/export.js',
+  './js/docx-generator.js',
   './js/lib/theme.js',
   './js/lib/storage.js',
   './js/lib/date-utils.js',

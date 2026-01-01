@@ -8,7 +8,7 @@
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#8B0000">
+  <meta name="theme-color" content="#003366">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
 
   <!-- Styles -->
@@ -22,28 +22,34 @@
   <header class="header no-print">
     <div class="header__container">
       <div class="header__brand">
-        <h1 class="header__title">After Action Report Generator</h1>
-        <p class="header__subtitle">TECOM Format with MCCLL-compatible structure</p>
+        <span class="header__logo" aria-hidden="true">&#9734;</span>
+        <div>
+          <h1 class="header__title">After Action Report Generator</h1>
+          <p class="header__subtitle">TECOM Format &bull; MCO 3504.1 Compliant</p>
+        </div>
       </div>
       <div class="header__actions">
-        <button type="button" id="previewToggle" class="btn btn--outline header-btn">
-          Live Preview
+        <button type="button" id="previewToggle" class="header-btn" aria-pressed="false">
+          <span aria-hidden="true">&#128196;</span> Live Preview
         </button>
-        <button type="button" id="theme-toggle" class="btn btn--ghost header-btn" aria-label="Toggle theme">
-          <span class="theme-icon">&#9788;</span>
+        <button type="button" id="theme-toggle" class="header-btn" aria-label="Toggle theme">
+          <span class="theme-icon" aria-hidden="true">&#9788;</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main id="main" class="container">
-    <form id="aar-form" class="aar-form">
+  <main id="main" class="main-content">
+    <form id="aar-form" class="aar-form" novalidate>
 
       <!-- Section 1: Unit Information -->
-      <section class="card form-section">
+      <section class="card">
         <div class="card__header">
-          <h2 class="card__title">Unit Information</h2>
+          <h2 class="card__title">
+            <span class="card__title-icon" aria-hidden="true">&#127970;</span>
+            Unit Information
+          </h2>
         </div>
         <div class="form-grid">
           <div class="form-group form-group--full">
@@ -74,9 +80,12 @@
       </section>
 
       <!-- Section 2: From / To -->
-      <section class="card form-section">
+      <section class="card">
         <div class="card__header">
-          <h2 class="card__title">From / To</h2>
+          <h2 class="card__title">
+            <span class="card__title-icon" aria-hidden="true">&#128100;</span>
+            From / To
+          </h2>
         </div>
         <div class="form-grid">
           <div class="form-group">
@@ -133,9 +142,12 @@
       </section>
 
       <!-- Section 3: Event Details -->
-      <section class="card form-section">
+      <section class="card">
         <div class="card__header">
-          <h2 class="card__title">Event Details</h2>
+          <h2 class="card__title">
+            <span class="card__title-icon" aria-hidden="true">&#128197;</span>
+            Event Details
+          </h2>
         </div>
         <div class="form-grid">
           <div class="form-group form-group--full">
@@ -154,19 +166,22 @@
       </section>
 
       <!-- Section 4: IMPROVE Topics -->
-      <section class="card form-section">
+      <section class="card">
         <div class="card__header">
-          <h2 class="card__title">1. IMPROVE</h2>
-          <p class="card__subtitle">Areas that need improvement</p>
+          <h2 class="card__title">
+            <span class="card__title-icon" aria-hidden="true">&#128200;</span>
+            1. IMPROVE
+          </h2>
+          <p class="card__subtitle">Areas that need improvement. Drag topics to reorder.</p>
         </div>
 
-        <details class="guided-prompts-toggle">
-          <summary>Writing prompts</summary>
+        <details class="guided-prompts">
+          <summary>&#128161; Writing Prompts</summary>
           <ul class="prompt-list">
-            <li>What happened? (specific incident/observation)</li>
-            <li>When/where did it occur? (phase, location)</li>
-            <li>Who was affected? (individuals, sections, unit)</li>
-            <li>What was the impact? (mission, safety, efficiency)</li>
+            <li><strong>What happened?</strong> Specific incident or observation</li>
+            <li><strong>When/where?</strong> Phase of operation, location</li>
+            <li><strong>Who was affected?</strong> Individuals, sections, or entire unit</li>
+            <li><strong>What was the impact?</strong> Mission, safety, efficiency</li>
           </ul>
         </details>
 
@@ -180,19 +195,22 @@
       </section>
 
       <!-- Section 5: SUSTAIN Topics -->
-      <section class="card form-section">
+      <section class="card">
         <div class="card__header">
-          <h2 class="card__title">2. SUSTAIN</h2>
-          <p class="card__subtitle">Areas that were effective and should continue</p>
+          <h2 class="card__title">
+            <span class="card__title-icon" aria-hidden="true">&#9989;</span>
+            2. SUSTAIN
+          </h2>
+          <p class="card__subtitle">Areas that were effective and should continue. Drag topics to reorder.</p>
         </div>
 
-        <details class="guided-prompts-toggle">
-          <summary>Writing prompts</summary>
+        <details class="guided-prompts">
+          <summary>&#128161; Writing Prompts</summary>
           <ul class="prompt-list">
-            <li>What worked well?</li>
-            <li>How did it contribute to mission success?</li>
-            <li>What made it effective?</li>
-            <li>Can it be replicated/scaled?</li>
+            <li><strong>What worked well?</strong> Specific actions or procedures</li>
+            <li><strong>How did it help?</strong> Contribution to mission success</li>
+            <li><strong>Why was it effective?</strong> Key factors</li>
+            <li><strong>Can it be replicated?</strong> Scalability to other units</li>
           </ul>
         </details>
 
@@ -206,9 +224,12 @@
       </section>
 
       <!-- Section 6: POC & Signature -->
-      <section class="card form-section">
+      <section class="card">
         <div class="card__header">
-          <h2 class="card__title">Point of Contact & Signature</h2>
+          <h2 class="card__title">
+            <span class="card__title-icon" aria-hidden="true">&#9997;</span>
+            Point of Contact & Signature
+          </h2>
         </div>
         <div class="form-grid">
           <div class="form-group">
@@ -264,28 +285,37 @@
           <div class="form-group form-group--full">
             <label for="signatureName" class="label label--required">Signature Name</label>
             <input type="text" id="signatureName" class="input" placeholder="e.g., J. A. SMITH" required>
-            <p class="help-text">Initials and last name in caps</p>
+            <p class="help-text">Initials and last name in caps (e.g., J. A. SMITH)</p>
           </div>
         </div>
       </section>
 
       <!-- Actions -->
-      <section class="card form-section actions-section no-print">
+      <section class="card actions-card no-print">
+        <div class="card__header">
+          <h2 class="card__title">
+            <span class="card__title-icon" aria-hidden="true">&#128190;</span>
+            Export & Save
+          </h2>
+        </div>
         <div class="action-buttons">
-          <button type="button" id="exportPdfBtn" class="btn btn--primary">
-            Export PDF
+          <button type="button" id="exportPdfBtn" class="btn btn--primary btn--lg">
+            <span aria-hidden="true">&#128196;</span> Export PDF
           </button>
-          <button type="button" id="copyBtn" class="btn btn--secondary">
-            Copy to Clipboard
+          <button type="button" id="exportWordBtn" class="btn btn--primary btn--lg">
+            <span aria-hidden="true">&#128195;</span> Export Word
+          </button>
+          <button type="button" id="copyBtn" class="btn btn--outline">
+            <span aria-hidden="true">&#128203;</span> Copy Text
           </button>
           <button type="button" id="saveDraftBtn" class="btn btn--outline">
-            Save Draft
+            <span aria-hidden="true">&#128190;</span> Save Draft
           </button>
           <button type="button" id="loadDraftBtn" class="btn btn--outline">
-            Load Draft
+            <span aria-hidden="true">&#128194;</span> Load Draft
           </button>
           <button type="button" id="clearAllBtn" class="btn btn--ghost">
-            Clear All
+            <span aria-hidden="true">&#128465;</span> Clear All
           </button>
         </div>
       </section>
@@ -295,7 +325,7 @@
   <!-- Live Preview Pane -->
   <div id="livePreviewPane" class="live-preview-pane">
     <div class="preview-header">
-      <span>Live Preview</span>
+      <span><span aria-hidden="true">&#128196;</span> Live Preview</span>
       <button type="button" class="preview-close" id="previewClose" aria-label="Close preview">&times;</button>
     </div>
     <div id="previewLoading" class="preview-loading">
@@ -306,56 +336,61 @@
   </div>
 
   <!-- Toast Notification -->
-  <div class="toast" id="toast">
+  <div class="toast" id="toast" role="alert" aria-live="polite">
     <span class="toast__message" id="toastMessage"></span>
   </div>
 
   <!-- Footer -->
   <footer class="footer no-print">
-    <div class="container">
-      <p class="text-sm text-secondary text-center">
-        Free and open source. <a href="https://github.com/jeranaias/aar-generator">View on GitHub</a>
-      </p>
-      <p class="text-sm text-secondary text-center mt-4">
-        Part of the <a href="https://jeranaias.github.io/usmc-tools/">USMC Tools</a> suite.
-      </p>
-    </div>
+    <p class="text-sm text-secondary">
+      Free and open source. <a href="https://github.com/jeranaias/aar-generator">View on GitHub</a>
+    </p>
+    <p class="text-sm text-secondary">
+      Part of the <a href="https://jeranaias.github.io/usmc-tools/">USMC Tools</a> suite.
+    </p>
   </footer>
 
   <!-- Topic Template -->
   <template id="topicTemplate">
-    <div class="topic-card" data-topic-id="">
+    <div class="topic-card" data-topic-id="" draggable="true">
       <div class="topic-header">
-        <span class="topic-label">Topic <span class="topic-letter"></span></span>
-        <button type="button" class="btn btn--ghost btn--sm remove-topic" aria-label="Remove topic">
-          &times;
-        </button>
+        <div class="topic-header-left">
+          <span class="drag-handle" title="Drag to reorder" aria-hidden="true">&#9776;</span>
+          <span class="topic-label">Topic <span class="topic-letter"></span></span>
+        </div>
+        <div class="topic-actions">
+          <button type="button" class="btn btn--ghost btn--sm remove-topic" aria-label="Remove topic">
+            &times;
+          </button>
+        </div>
       </div>
       <div class="form-group">
-        <label class="label label--required">Topic</label>
-        <input type="text" class="input topic-title" placeholder="One line description" maxlength="60">
-        <div class="char-counter"><span class="char-count">0</span>/60</div>
+        <label class="label label--required">Topic Title</label>
+        <input type="text" class="input topic-title" placeholder="Brief one-line description" maxlength="100">
+        <div class="char-counter"><span class="char-count">0</span>/100</div>
       </div>
       <div class="form-group">
         <label class="label label--required">Discussion</label>
-        <textarea class="input textarea topic-discussion" placeholder="Background and details"></textarea>
+        <textarea class="input textarea topic-discussion" placeholder="Provide background and details about this topic..." rows="4"></textarea>
       </div>
       <div class="form-group">
         <label class="label label--required">Recommendation</label>
-        <textarea class="input textarea topic-recommendation" placeholder="Specific recommendations"></textarea>
+        <textarea class="input textarea topic-recommendation" placeholder="Specific actionable recommendations..." rows="3"></textarea>
       </div>
     </div>
   </template>
 
-  <!-- jsPDF Library -->
+  <!-- External Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
 
-  <!-- Scripts -->
+  <!-- App Scripts -->
   <script src="js/lib/theme.js"></script>
   <script src="js/lib/storage.js"></script>
   <script src="js/lib/date-utils.js"></script>
   <script src="js/aar-builder.js"></script>
   <script src="js/pdf-generator.js"></script>
+  <script src="js/docx-generator.js"></script>
   <script src="js/export.js"></script>
   <script src="js/app.js"></script>
 
