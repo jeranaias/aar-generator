@@ -1,4 +1,18 @@
 /**
+ * PWA Install prompt handling
+ */
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) {
+    installBtn.style.display = 'inline-block';
+  }
+});
+
+/**
  * AAR Generator - Main Application
  * Handles form interactions, drag-drop, live preview, and exports
  */
@@ -573,6 +587,24 @@ const AARApp = {
     Storage.remove(this.STORAGE_KEY);
     this.schedulePreviewUpdate();
     this.showToast('Form cleared', 'success');
+  },
+
+  /**
+   * Install PWA
+   */
+  installPWA() {
+    if (!deferredInstallPrompt) {
+      alert('Use your browser menu to install this app');
+      return;
+    }
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((choiceResult) => {
+      deferredInstallPrompt = null;
+      const installBtn = document.getElementById('pwa-install-btn');
+      if (installBtn) {
+        installBtn.style.display = 'none';
+      }
+    });
   },
 
   /**

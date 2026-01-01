@@ -3,7 +3,7 @@
  * Enables offline functionality
  */
 
-const CACHE_NAME = 'aar-generator-v5';
+const CACHE_NAME = 'aar-generator-v6';
 
 // Use relative URLs for GitHub Pages compatibility
 const urlsToCache = [
