@@ -1,10 +1,11 @@
 /**
  * AAR Generator - Main Application
- * Handles form interactions, topic management, and exports
+ * Handles form interactions, live preview, and exports
  */
 const AARApp = {
   STORAGE_KEY: 'aar-generator-draft',
   topicIdCounter: 0,
+  previewDebounceTimer: null,
 
   /**
    * Initialize the application
@@ -15,20 +16,19 @@ const AARApp = {
     this.addInitialTopics();
     this.setDefaultDates();
     this.loadDraft();
-    this.updateSubjectPreview();
+    this.updateLivePreview();
   },
 
   /**
-   * Cache DOM elements for performance
+   * Cache DOM elements
    */
   cacheElements() {
     this.form = document.getElementById('aar-form');
     this.improveContainer = document.getElementById('improveTopics');
     this.sustainContainer = document.getElementById('sustainTopics');
     this.topicTemplate = document.getElementById('topicTemplate');
-    this.subjectPreview = document.getElementById('subjectPreview');
-    this.previewModal = document.getElementById('previewModal');
     this.previewContent = document.getElementById('previewContent');
+    this.previewPanel = document.getElementById('previewPanel');
     this.toast = document.getElementById('toast');
     this.toastMessage = document.getElementById('toastMessage');
   },
@@ -38,68 +38,71 @@ const AARApp = {
    */
   bindEvents() {
     // Theme toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => ThemeManager.toggle());
-    }
+    document.getElementById('theme-toggle')?.addEventListener('click', () => ThemeManager.toggle());
+
+    // Preview toggle (mobile)
+    document.getElementById('toggle-preview')?.addEventListener('click', () => this.togglePreview());
 
     // Add topic buttons
-    document.getElementById('addImprove').addEventListener('click', () => {
-      this.addTopic('improve');
-    });
+    document.getElementById('addImprove').addEventListener('click', () => this.addTopic('improve'));
+    document.getElementById('addSustain').addEventListener('click', () => this.addTopic('sustain'));
 
-    document.getElementById('addSustain').addEventListener('click', () => {
-      this.addTopic('sustain');
-    });
+    // Export buttons (both sets)
+    document.getElementById('exportPdfBtn')?.addEventListener('click', () => this.exportPDF());
+    document.getElementById('exportPdfBtn2')?.addEventListener('click', () => this.exportPDF());
+    document.getElementById('copyBtn')?.addEventListener('click', () => this.copyToClipboard());
+    document.getElementById('copyBtn2')?.addEventListener('click', () => this.copyToClipboard());
+    document.getElementById('printBtn')?.addEventListener('click', () => this.printAAR());
 
-    // Action buttons
-    document.getElementById('previewBtn').addEventListener('click', () => this.showPreview());
-    document.getElementById('copyBtn').addEventListener('click', () => this.copyToClipboard());
-    document.getElementById('exportDocxBtn').addEventListener('click', () => this.exportDocx());
-    document.getElementById('saveDraftBtn').addEventListener('click', () => this.saveDraft());
-    document.getElementById('loadDraftBtn').addEventListener('click', () => this.loadDraftPrompt());
-    document.getElementById('clearAllBtn').addEventListener('click', () => this.clearAll());
+    // Draft buttons
+    document.getElementById('saveDraftBtn')?.addEventListener('click', () => this.saveDraft());
+    document.getElementById('loadDraftBtn')?.addEventListener('click', () => this.loadDraftPrompt());
+    document.getElementById('clearAllBtn')?.addEventListener('click', () => this.clearAll());
 
-    // Preview modal
-    document.getElementById('closePreview').addEventListener('click', () => this.closePreview());
-    document.getElementById('copyFromPreview').addEventListener('click', () => this.copyToClipboard());
-    document.getElementById('printPreview').addEventListener('click', () => this.printAAR());
+    // Phone formatting
+    document.getElementById('pocPhone')?.addEventListener('input', (e) => this.formatPhoneNumber(e.target));
 
-    // Close modal on overlay click
-    this.previewModal.addEventListener('click', (e) => {
-      if (e.target === this.previewModal) {
-        this.closePreview();
-      }
-    });
-
-    // Close modal on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.previewModal.classList.contains('modal-overlay--active')) {
-        this.closePreview();
-      }
-    });
-
-    // Subject preview updates
-    ['eventName', 'eventStartDate', 'eventEndDate'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.addEventListener('input', () => this.updateSubjectPreview());
-        el.addEventListener('change', () => this.updateSubjectPreview());
-      }
-    });
-
-    // Phone number formatting
-    const pocPhone = document.getElementById('pocPhone');
-    if (pocPhone) {
-      pocPhone.addEventListener('input', (e) => this.formatPhoneNumber(e.target));
-    }
-
-    // Auto-save on input
-    this.form.addEventListener('input', () => this.autoSave());
+    // Live preview updates - listen to all form inputs
+    this.form.addEventListener('input', () => this.schedulePreviewUpdate());
+    this.form.addEventListener('change', () => this.schedulePreviewUpdate());
   },
 
   /**
-   * Add initial topics (one of each type)
+   * Toggle preview panel visibility (mobile)
+   */
+  togglePreview() {
+    this.previewPanel.classList.toggle('hidden');
+    const btn = document.getElementById('toggle-preview');
+    const icon = btn.querySelector('.preview-icon');
+    if (this.previewPanel.classList.contains('hidden')) {
+      icon.innerHTML = '&#9744;'; // Empty checkbox
+    } else {
+      icon.innerHTML = '&#9745;'; // Checked checkbox
+    }
+  },
+
+  /**
+   * Schedule preview update (debounced)
+   */
+  schedulePreviewUpdate() {
+    clearTimeout(this.previewDebounceTimer);
+    this.previewDebounceTimer = setTimeout(() => {
+      this.updateLivePreview();
+      this.autoSave();
+    }, 150);
+  },
+
+  /**
+   * Update live preview
+   */
+  updateLivePreview() {
+    const data = this.gatherFormData();
+    const content = AARBuilder.generate(data);
+    this.previewContent.textContent = content;
+  },
+
+  /**
+   * Add initial topics
    */
   addInitialTopics() {
     this.addTopic('improve');
@@ -107,7 +110,7 @@ const AARApp = {
   },
 
   /**
-   * Set default dates (today for document date)
+   * Set default dates
    */
   setDefaultDates() {
     const today = DateUtils.today();
@@ -119,38 +122,35 @@ const AARApp = {
 
   /**
    * Add a new topic card
-   * @param {string} type - 'improve' or 'sustain'
-   * @param {Object} data - Optional data to populate
-   * @returns {HTMLElement} The created topic card
    */
   addTopic(type, data = null) {
     const container = type === 'improve' ? this.improveContainer : this.sustainContainer;
     const template = this.topicTemplate.content.cloneNode(true);
     const card = template.querySelector('.topic-card');
 
-    // Set unique ID
     const id = ++this.topicIdCounter;
     card.dataset.topicId = id;
     card.dataset.topicType = type;
 
-    // Set letter label
     const existingTopics = container.querySelectorAll('.topic-card');
-    const letter = String.fromCharCode(65 + existingTopics.length); // A, B, C...
+    const letter = String.fromCharCode(65 + existingTopics.length);
     card.querySelector('.topic-letter').textContent = letter;
 
-    // Bind remove button
     card.querySelector('.remove-topic').addEventListener('click', () => {
       this.removeTopic(card, type);
     });
 
-    // Bind character counter
     const titleInput = card.querySelector('.topic-title');
     const charCounter = card.querySelector('.char-counter');
     titleInput.addEventListener('input', () => {
       this.updateCharCounter(titleInput, charCounter, 60);
+      this.schedulePreviewUpdate();
     });
 
-    // Populate data if provided
+    // Bind other inputs for live preview
+    card.querySelector('.topic-discussion').addEventListener('input', () => this.schedulePreviewUpdate());
+    card.querySelector('.topic-recommendation').addEventListener('input', () => this.schedulePreviewUpdate());
+
     if (data) {
       titleInput.value = data.topic || '';
       card.querySelector('.topic-discussion').value = data.discussion || '';
@@ -159,19 +159,17 @@ const AARApp = {
     }
 
     container.appendChild(card);
+    this.schedulePreviewUpdate();
     return card;
   },
 
   /**
    * Remove a topic card
-   * @param {HTMLElement} card - Topic card element
-   * @param {string} type - 'improve' or 'sustain'
    */
   removeTopic(card, type) {
     const container = type === 'improve' ? this.improveContainer : this.sustainContainer;
     const topics = container.querySelectorAll('.topic-card');
 
-    // Require at least one topic
     if (topics.length <= 1) {
       this.showToast('At least one topic is required', 'error');
       return;
@@ -179,33 +177,26 @@ const AARApp = {
 
     card.remove();
     this.updateTopicLetters(type);
-    this.autoSave();
+    this.schedulePreviewUpdate();
   },
 
   /**
-   * Update topic letters after removal
-   * @param {string} type - 'improve' or 'sustain'
+   * Update topic letters
    */
   updateTopicLetters(type) {
     const container = type === 'improve' ? this.improveContainer : this.sustainContainer;
     const topics = container.querySelectorAll('.topic-card');
-
     topics.forEach((card, index) => {
-      const letter = String.fromCharCode(65 + index);
-      card.querySelector('.topic-letter').textContent = letter;
+      card.querySelector('.topic-letter').textContent = String.fromCharCode(65 + index);
     });
   },
 
   /**
    * Update character counter
-   * @param {HTMLInputElement} input - Input element
-   * @param {HTMLElement} counter - Counter element
-   * @param {number} max - Max characters
    */
   updateCharCounter(input, counter, max) {
     const count = input.value.length;
     counter.querySelector('.char-count').textContent = count;
-
     counter.classList.remove('char-counter--warning', 'char-counter--error');
     if (count > max) {
       counter.classList.add('char-counter--error');
@@ -215,15 +206,11 @@ const AARApp = {
   },
 
   /**
-   * Format phone number as (XXX) XXX-XXXX
-   * @param {HTMLInputElement} input - Phone input element
+   * Format phone number
    */
   formatPhoneNumber(input) {
     let value = input.value.replace(/\D/g, '');
-
-    if (value.length > 10) {
-      value = value.substring(0, 10);
-    }
+    if (value.length > 10) value = value.substring(0, 10);
 
     if (value.length >= 6) {
       value = `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6)}`;
@@ -232,29 +219,14 @@ const AARApp = {
     } else if (value.length > 0) {
       value = `(${value}`;
     }
-
     input.value = value;
   },
 
   /**
-   * Update subject line preview
-   */
-  updateSubjectPreview() {
-    const data = {
-      eventName: document.getElementById('eventName').value,
-      eventStartDate: document.getElementById('eventStartDate').value,
-      eventEndDate: document.getElementById('eventEndDate').value
-    };
-
-    this.subjectPreview.textContent = AARBuilder.getSubjectPreview(data);
-  },
-
-  /**
-   * Gather all form data
-   * @returns {Object} Form data object
+   * Gather form data
    */
   gatherFormData() {
-    const data = {
+    return {
       unitName: document.getElementById('unitName').value,
       unitAddress1: document.getElementById('unitAddress1').value,
       unitAddress2: document.getElementById('unitAddress2').value,
@@ -276,14 +248,10 @@ const AARApp = {
       improveTopics: this.gatherTopics('improve'),
       sustainTopics: this.gatherTopics('sustain')
     };
-
-    return data;
   },
 
   /**
-   * Gather topics from a container
-   * @param {string} type - 'improve' or 'sustain'
-   * @returns {Array} Array of topic objects
+   * Gather topics
    */
   gatherTopics(type) {
     const container = type === 'improve' ? this.improveContainer : this.sustainContainer;
@@ -303,95 +271,63 @@ const AARApp = {
   },
 
   /**
-   * Show preview modal
+   * Export PDF
    */
-  showPreview() {
-    const data = this.gatherFormData();
-    const content = AARBuilder.generate(data);
-    this.previewContent.textContent = content;
-    this.previewModal.classList.add('modal-overlay--active');
-    document.body.style.overflow = 'hidden';
+  exportPDF() {
+    try {
+      const data = this.gatherFormData();
+      PDFGenerator.exportPDF(data);
+      this.showToast('PDF exported!', 'success');
+    } catch (err) {
+      console.error('PDF export error:', err);
+      this.showToast('Failed to export PDF', 'error');
+    }
   },
 
   /**
-   * Close preview modal
-   */
-  closePreview() {
-    this.previewModal.classList.remove('modal-overlay--active');
-    document.body.style.overflow = '';
-  },
-
-  /**
-   * Copy AAR to clipboard
+   * Copy to clipboard
    */
   async copyToClipboard() {
     const data = this.gatherFormData();
     const content = AARBuilder.generate(data);
-
     const success = await AARExport.copyToClipboard(content);
     if (success) {
       this.showToast('Copied to clipboard!', 'success');
     } else {
-      this.showToast('Failed to copy to clipboard', 'error');
+      this.showToast('Failed to copy', 'error');
     }
   },
 
   /**
-   * Export AAR as DOCX
-   */
-  exportDocx() {
-    const data = this.gatherFormData();
-    const validation = AARBuilder.validate(data);
-
-    if (!validation.valid) {
-      this.showToast('Please fill in all required fields', 'error');
-      console.log('Validation errors:', validation.errors);
-      return;
-    }
-
-    const content = AARBuilder.generate(data);
-    AARExport.exportDocx(data, content);
-    this.showToast('DOCX exported!', 'success');
-  },
-
-  /**
-   * Print the AAR
+   * Print AAR
    */
   printAAR() {
-    const content = this.previewContent.textContent;
-    AARExport.print(content);
+    window.print();
   },
 
   /**
-   * Save draft to localStorage
+   * Save draft
    */
   saveDraft() {
     const data = this.gatherFormData();
     const success = Storage.save(this.STORAGE_KEY, data);
-
     if (success) {
       this.showToast('Draft saved!', 'success');
     } else {
-      this.showToast('Failed to save draft', 'error');
+      this.showToast('Failed to save', 'error');
     }
   },
 
   /**
-   * Auto-save (debounced)
+   * Auto-save
    */
-  autoSave: (function() {
-    let timeout;
-    return function() {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        const data = this.gatherFormData();
-        Storage.save(this.STORAGE_KEY, data);
-      }, 1000);
-    };
-  })(),
+  autoSave() {
+    const data = this.gatherFormData();
+    Storage.save(this.STORAGE_KEY, data);
+  },
 
   /**
-   * Prompt before loading draft
+   * Load draft prompt
    */
   loadDraftPrompt() {
     const draft = Storage.load(this.STORAGE_KEY);
@@ -407,7 +343,7 @@ const AARApp = {
   },
 
   /**
-   * Load draft on page load (silent)
+   * Load draft on init
    */
   loadDraft() {
     const draft = Storage.load(this.STORAGE_KEY);
@@ -418,94 +354,71 @@ const AARApp = {
 
   /**
    * Populate form with data
-   * @param {Object} data - Form data
    */
   populateForm(data) {
-    // Simple fields
-    const simpleFields = [
+    const fields = [
       'unitName', 'unitAddress1', 'unitAddress2', 'ssic', 'officeCode',
       'documentDate', 'fromRank', 'fromName', 'fromBillet', 'toTitle',
       'eventName', 'eventStartDate', 'eventEndDate',
       'pocRank', 'pocName', 'pocPhone', 'pocEmail', 'signatureName'
     ];
 
-    simpleFields.forEach(field => {
+    fields.forEach(field => {
       const el = document.getElementById(field);
       if (el && data[field] !== undefined) {
         el.value = data[field];
       }
     });
 
-    // Clear existing topics
+    // Clear and rebuild topics
     this.improveContainer.innerHTML = '';
     this.sustainContainer.innerHTML = '';
 
-    // Add improve topics
-    if (data.improveTopics && data.improveTopics.length > 0) {
-      data.improveTopics.forEach(topic => {
-        this.addTopic('improve', topic);
-      });
+    if (data.improveTopics?.length > 0) {
+      data.improveTopics.forEach(topic => this.addTopic('improve', topic));
     } else {
       this.addTopic('improve');
     }
 
-    // Add sustain topics
-    if (data.sustainTopics && data.sustainTopics.length > 0) {
-      data.sustainTopics.forEach(topic => {
-        this.addTopic('sustain', topic);
-      });
+    if (data.sustainTopics?.length > 0) {
+      data.sustainTopics.forEach(topic => this.addTopic('sustain', topic));
     } else {
       this.addTopic('sustain');
     }
 
-    // Update preview
-    this.updateSubjectPreview();
+    this.updateLivePreview();
   },
 
   /**
-   * Clear all form data
+   * Clear all
    */
   clearAll() {
-    if (!confirm('Clear all form data? This cannot be undone.')) {
-      return;
-    }
+    if (!confirm('Clear all form data? This cannot be undone.')) return;
 
     this.form.reset();
-
-    // Clear topics and add fresh ones
     this.improveContainer.innerHTML = '';
     this.sustainContainer.innerHTML = '';
     this.addTopic('improve');
     this.addTopic('sustain');
-
-    // Reset defaults
     this.setDefaultDates();
     document.getElementById('ssic').value = '3504';
     document.getElementById('toTitle').value = 'Operations Officer';
-
-    // Clear storage
     Storage.remove(this.STORAGE_KEY);
-
-    this.updateSubjectPreview();
+    this.updateLivePreview();
     this.showToast('Form cleared', 'success');
   },
 
   /**
-   * Show toast notification
-   * @param {string} message - Message to display
-   * @param {string} type - 'success' or 'error'
+   * Show toast
    */
   showToast(message, type = 'success') {
     this.toastMessage.textContent = message;
     this.toast.classList.remove('toast--success', 'toast--error');
     this.toast.classList.add(`toast--${type}`);
     this.toast.classList.add('toast--visible');
-
-    setTimeout(() => {
-      this.toast.classList.remove('toast--visible');
-    }, 3000);
+    setTimeout(() => this.toast.classList.remove('toast--visible'), 3000);
   }
 };
 
-// Initialize on DOM ready
+// Initialize
 document.addEventListener('DOMContentLoaded', () => AARApp.init());
