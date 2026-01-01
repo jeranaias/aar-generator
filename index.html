@@ -340,6 +340,18 @@
     <span class="toast__message" id="toastMessage"></span>
   </div>
 
+  <!-- Install Banner -->
+  <div id="installBanner" class="install-banner" hidden>
+    <span>Install this app for offline use</span>
+    <button type="button" id="installBtn" class="btn btn--accent btn--sm">Install</button>
+    <button type="button" id="dismissInstall" class="btn btn--ghost btn--sm" aria-label="Dismiss">&times;</button>
+  </div>
+
+  <!-- Offline Indicator -->
+  <div id="offlineIndicator" class="offline-indicator" hidden>
+    <span>You're offline - changes saved locally</span>
+  </div>
+
   <!-- Footer -->
   <footer class="footer no-print">
     <p class="text-sm text-secondary">
@@ -348,6 +360,7 @@
     <p class="text-sm text-secondary">
       Part of the <a href="https://jeranaias.github.io/usmc-tools/">USMC Tools</a> suite.
     </p>
+    <p class="text-sm text-secondary mt-2" id="pwaStatus"></p>
   </footer>
 
   <!-- Topic Template -->
@@ -394,10 +407,61 @@
   <script src="js/export.js"></script>
   <script src="js/app.js"></script>
 
-  <!-- Service Worker Registration -->
+  <!-- Service Worker & PWA -->
   <script>
+    // Service Worker Registration
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => {
+          const status = document.getElementById('pwaStatus');
+          if (status) status.textContent = 'Available offline';
+        });
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    const installBanner = document.getElementById('installBanner');
+    const installBtn = document.getElementById('installBtn');
+    const dismissBtn = document.getElementById('dismissInstall');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Check if user dismissed before
+      if (localStorage.getItem('pwa-install-dismissed') !== 'true') {
+        installBanner.hidden = false;
+      }
+    });
+
+    installBtn?.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        installBanner.hidden = true;
+      }
+      deferredPrompt = null;
+    });
+
+    dismissBtn?.addEventListener('click', () => {
+      installBanner.hidden = true;
+      localStorage.setItem('pwa-install-dismissed', 'true');
+    });
+
+    // Offline Indicator
+    const offlineIndicator = document.getElementById('offlineIndicator');
+
+    window.addEventListener('online', () => {
+      offlineIndicator.hidden = true;
+    });
+
+    window.addEventListener('offline', () => {
+      offlineIndicator.hidden = false;
+    });
+
+    // Check initial state
+    if (!navigator.onLine && offlineIndicator) {
+      offlineIndicator.hidden = false;
     }
   </script>
 </body>
