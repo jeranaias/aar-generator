@@ -93,10 +93,14 @@
 
 /* Dark Mode */
 [data-theme="dark"] {
-  --primary: #4a90d9;
-  --primary-light: #6ba3e0;
-  --primary-dark: #3a7bc8;
-  --accent: #d4bc7c;
+  --primary: #6B0000;
+  --primary-light: #8B0000;
+  --primary-dark: #4A0000;
+  --accent: #FFD700;
+  --accent-light: #FFE44D;
+  --accent-dark: #D4AF00;
+  --btn-primary: #DC3545;
+  --btn-primary-hover: #C82333;
   --bg-primary: #1a1a1a;
   --bg-secondary: #242424;
   --surface: #2d2d2d;
@@ -107,6 +111,8 @@
   --border-medium: #555555;
   --gray-50: #2d2d2d;
   --gray-100: #383838;
+  --gray-700: #1a1a1a;
+  --gray-800: #121212;
 }
 
 /* Night Mode (Tactical Red) */
@@ -115,6 +121,10 @@
   --primary-light: #ff0000;
   --primary-dark: #990000;
   --accent: #ff0000;
+  --accent-light: #ff3333;
+  --accent-dark: #cc0000;
+  --btn-primary: #ff0000;
+  --btn-primary-hover: #cc0000;
   --bg-primary: #000000;
   --bg-secondary: #0a0000;
   --surface: #110000;
@@ -123,6 +133,8 @@
   --text-tertiary: #990000;
   --border-light: #330000;
   --border-medium: #550000;
+  --gray-700: #0a0000;
+  --gray-800: #050000;
 }
 
 /* Reset */
@@ -219,7 +231,7 @@ body {
 
 .header__subtitle {
   font-size: var(--text-xs);
-  opacity: 0.9;
+  color: var(--accent);
   margin-top: var(--space-1);
   font-weight: var(--font-normal);
 }
@@ -255,10 +267,6 @@ body {
   background: var(--btn-primary);
   border-color: var(--btn-primary);
   color: var(--white);
-}
-
-.header__subtitle {
-  color: var(--accent);
 }
 
 @media (min-width: 768px) {
@@ -890,6 +898,39 @@ body {
 
 .toast--info {
   background: var(--info);
+}
+
+/* ===================================
+   Install Guide
+   =================================== */
+.install-guide {
+  cursor: pointer;
+}
+
+.install-guide .card__title {
+  padding: var(--space-4);
+  margin-bottom: 0;
+}
+
+.install-guide[open] .card__title {
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.install-guide__content {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.install-guide__content p {
+  margin-bottom: var(--space-4);
+}
+
+.install-guide__content p:last-child {
+  margin-bottom: 0;
+}
+
+.install-guide #pwa-install-btn {
+  margin-bottom: var(--space-4);
 }
 
 /* ===================================
