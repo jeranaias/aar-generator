@@ -80,6 +80,9 @@ const AARApp = {
     document.getElementById('loadDraftBtn')?.addEventListener('click', () => this.loadDraftPrompt());
     document.getElementById('clearAllBtn')?.addEventListener('click', () => this.clearAll());
 
+    // Load Example button
+    document.getElementById('loadExampleBtn')?.addEventListener('click', () => this.loadExample());
+
     // Phone formatting
     document.getElementById('pocPhone')?.addEventListener('input', (e) => this.formatPhoneNumber(e.target));
 
@@ -207,12 +210,14 @@ const AARApp = {
       this.mainContent.classList.add('preview-active');
       this.previewToggleBtn.classList.add('active');
       this.previewToggleBtn.setAttribute('aria-pressed', 'true');
+      this.previewToggleBtn.textContent = 'Hide Preview';
       this.updateLivePreview();
     } else {
       this.previewPane.classList.remove('show');
       this.mainContent.classList.remove('preview-active');
       this.previewToggleBtn.classList.remove('active');
       this.previewToggleBtn.setAttribute('aria-pressed', 'false');
+      this.previewToggleBtn.textContent = 'Live Preview';
       // Clean up blob URL when closing
       if (this.currentBlobUrl) {
         URL.revokeObjectURL(this.currentBlobUrl);
@@ -587,6 +592,49 @@ const AARApp = {
     Storage.remove(this.STORAGE_KEY);
     this.schedulePreviewUpdate();
     this.showToast('Form cleared', 'success');
+  },
+
+  /**
+   * Load example data for demonstration
+   */
+  loadExample() {
+    const exampleData = {
+      unitName: '1ST BATTALION, 5TH MARINES',
+      unitAddress1: 'BOX 555500',
+      unitAddress2: 'CAMP PENDLETON CA 92055-5500',
+      ssic: '3504',
+      officeCode: 'S-3',
+      documentDate: DateUtils.today(),
+      fromRank: 'Capt',
+      fromName: 'John A Smith',
+      fromBillet: 'Training Officer',
+      toTitle: 'Operations Officer',
+      eventName: 'BATTALION LIVE FIRE EXERCISE',
+      eventStartDate: DateUtils.today(),
+      eventEndDate: DateUtils.today(),
+      pocRank: 'SSgt',
+      pocName: 'Michael B Johnson',
+      pocPhone: '(760) 555-1234',
+      pocEmail: 'michael.johnson@usmc.mil',
+      signatureName: 'J. A. SMITH',
+      improveTopics: [
+        {
+          topic: 'Communication between support elements',
+          discussion: 'During the live fire exercise, communication breakdowns occurred between the mortar section and the rifle companies during phase 2 of the operation. Radio checks were inconsistent and call signs were not standardized across all elements.',
+          recommendation: 'Conduct dedicated communications exercises prior to future live fire events. Establish and distribute a standardized call sign matrix at least 72 hours prior to execution.'
+        }
+      ],
+      sustainTopics: [
+        {
+          topic: 'Medical evacuation procedures',
+          discussion: 'The battalion aid station and casualty evacuation teams demonstrated exceptional proficiency during the exercise. Response times averaged under 4 minutes from point of injury to initial treatment, well within doctrinal standards.',
+          recommendation: 'Continue current CASEVAC training program. Document current procedures as a battalion SOP for future training events.'
+        }
+      ]
+    };
+
+    this.populateForm(exampleData);
+    this.showToast('Example loaded!', 'success');
   },
 
   /**

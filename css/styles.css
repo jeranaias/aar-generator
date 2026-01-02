@@ -390,6 +390,57 @@ body {
 }
 
 /* ===================================
+   Primary Actions (centered buttons)
+   =================================== */
+.primary-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-4);
+}
+
+.btn--preview {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  color: var(--white);
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-medium);
+  font-size: var(--text-base);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.btn--preview:hover:not(:disabled) {
+  background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn--preview.active {
+  background: linear-gradient(135deg, #991B1B 0%, #7F1D1D 100%);
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  border: 1px solid var(--border-medium);
+  transition: all 0.2s ease;
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: var(--bg-secondary);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+/* ===================================
    Form Elements
    =================================== */
 .form-group {
