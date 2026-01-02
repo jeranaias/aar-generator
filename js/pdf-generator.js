@@ -21,12 +21,14 @@ const PDFGenerator = {
     const MT = 72;        // Margin top (1")
     const MB = 72;        // Margin bottom (1")
     const CW = PW - ML - MR;  // Content width
-    const TAB = 45;       // Tab width for labels (From:, To:, etc.)
+
+    // Tab width for header labels (From:, To:, etc.)
+    const TAB = 45;
 
     // Font settings - Times New Roman, 12pt per SECNAV M-5216.5
     const fontName = 'times';
     const fontSize = 12;
-    const LH = TextUtils.getLineHeight(fontSize);  // Proper 1.17x line height
+    const LH = TextUtils.getLineHeight(fontSize);  // 1.17x line height
 
     // Paragraph indentation per SECNAV M-5216.5
     const IM = 15;        // Main paragraph text indent (after "1.")
@@ -62,23 +64,56 @@ const PDFGenerator = {
     }
 
     /**
-     * Add wrapped text with double spacing after periods
+     * Render paragraph text on same line as label, wrapping to left margin
+     * This matches NLG's renderFormattedText behavior
      */
-    function addText(text, x, maxWidth) {
-      if (!text) return;
+    function renderParagraph(label, labelX, text, textIndent) {
       const processed = TextUtils.ensureDoubleSpaces(text);
-      const lines = pdf.splitTextToSize(processed, maxWidth);
-      lines.forEach((line) => {
-        pageBreak(LH);
-        pdf.text(line, x, y);
+      const labelWidth = pdf.getTextWidth(label);
+      const textX = labelX + labelWidth + 4;  // 4pt gap after label
+      const firstLineWidth = CW - (labelX - ML) - labelWidth - 4;
+
+      // Draw the label
+      pdf.text(label, labelX, y);
+
+      // Split text to fit first line, then wrap to left margin
+      const words = processed.split(' ');
+      let currentLine = '';
+      let isFirstLine = true;
+      let currentX = textX;
+      let currentMaxWidth = firstLineWidth;
+
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        const testLine = currentLine ? currentLine + ' ' + word : word;
+        const testWidth = pdf.getTextWidth(testLine);
+
+        if (testWidth > currentMaxWidth && currentLine) {
+          // Draw current line
+          pdf.text(currentLine, currentX, y);
+          y += LH;
+          pageBreak(LH);
+
+          // Move to left margin for continuation
+          currentLine = word;
+          isFirstLine = false;
+          currentX = ML;
+          currentMaxWidth = CW;
+        } else {
+          currentLine = testLine;
+        }
+      }
+
+      // Draw remaining text
+      if (currentLine) {
+        pdf.text(currentLine, currentX, y);
         y += LH;
-      });
+      }
     }
 
     // ========================================
     // LETTERHEAD (centered, per SECNAV M-5216.5)
     // ========================================
-    // Service name - bold, slightly smaller than body
     pdf.setFont(fontName, 'bold');
     pdf.setFontSize(fontSize - 2);  // 10pt
     pdf.text('UNITED STATES MARINE CORPS', PW / 2, y, { align: 'center' });
@@ -157,12 +192,11 @@ const PDFGenerator = {
     });
 
     // ========================================
-    // REFERENCE (per SECNAV M-5216.5 format)
+    // REFERENCE
     // ========================================
     y += LH;
     pageBreak(LH * 3);
     pdf.text('Ref:', ML, y);
-    // Reference with two spaces after designator, wrapped properly
     const refLines = pdf.splitTextToSize(
       '(a)  MCO 3504.1 Marine Corps Lessons Learned Program (MCLLP) and the Marine Corps Center for Lessons Learned (MCCLL)',
       CW - TAB
@@ -175,145 +209,83 @@ const PDFGenerator = {
     // ========================================
     // PARAGRAPH 1: IMPROVE
     // ========================================
-    y += LH;  // Blank line before paragraph
+    y += LH;
     pageBreak(LH * 4);
-    pdf.text('1.', ML, y);
-    pdf.setFont(fontName, 'bold');
-    pdf.text('IMPROVE', ML + IM, y);
-    pdf.setFont(fontName, 'normal');
+
+    // "1.  Improve.  This paragraph..." - text continues on same line
+    const improveIntro = 'Improve.  This paragraph discusses areas of the event that need to be improved.';
+    renderParagraph('1.', ML, improveIntro, IM);
 
     // IMPROVE Topics
     if (data.improveTopics && data.improveTopics.length > 0) {
       data.improveTopics.forEach((topic, index) => {
         y += LH;  // Blank line before each topic
         pageBreak(LH * 6);
+
         const letter = TextUtils.getLetter(index) + '.';
+        const topicText = topic.topic || '[Topic description]';
 
-        // Topic title
-        pdf.text(letter, ML + IM, y);
-        const topicText = TextUtils.ensureDoubleSpaces(topic.topic || '[Topic description]');
-        const topicX = ML + IM + pdf.getTextWidth(letter) + 4;
-        const topicWidth = CW - IM - pdf.getTextWidth(letter) - 4;
-        const topicLines = pdf.splitTextToSize(topicText, topicWidth);
-        topicLines.forEach((line, i) => {
-          if (i > 0) pageBreak(LH);
-          pdf.text(line, i === 0 ? topicX : ML, y);
-          y += LH;
-        });
+        // "a.  Topic text continues on same line..."
+        renderParagraph(letter, ML + IM, topicText, IS);
 
-        // (1) Discussion
-        pageBreak(LH * 3);
-        pdf.text('(1)', ML + IM + IS, y);
-        pdf.setFont(fontName, 'bold');
-        pdf.text('Discussion.', ML + IM + IS + pdf.getTextWidth('(1)') + 4, y);
-        pdf.setFont(fontName, 'normal');
-        y += LH;
-
+        // (1)  Discussion.  Text continues on same line...
         if (topic.discussion) {
-          const discText = TextUtils.ensureDoubleSpaces(topic.discussion);
-          const discLines = pdf.splitTextToSize(discText, CW);
-          discLines.forEach(line => {
-            pageBreak(LH);
-            pdf.text(line, ML, y);
-            y += LH;
-          });
+          pageBreak(LH * 2);
+          const discText = 'Discussion.  ' + topic.discussion;
+          renderParagraph('(1)', ML + IM + IS, discText, ISS);
         }
 
-        // (2) Recommendation
-        pageBreak(LH * 3);
-        pdf.text('(2)', ML + IM + IS, y);
-        pdf.setFont(fontName, 'bold');
-        pdf.text('Recommendation.', ML + IM + IS + pdf.getTextWidth('(2)') + 4, y);
-        pdf.setFont(fontName, 'normal');
-        y += LH;
-
+        // (2)  Recommendation.  Text continues on same line...
         if (topic.recommendation) {
-          const recText = TextUtils.ensureDoubleSpaces(topic.recommendation);
-          const recLines = pdf.splitTextToSize(recText, CW);
-          recLines.forEach(line => {
-            pageBreak(LH);
-            pdf.text(line, ML, y);
-            y += LH;
-          });
+          pageBreak(LH * 2);
+          const recText = 'Recommendation.  ' + topic.recommendation;
+          renderParagraph('(2)', ML + IM + IS, recText, ISS);
         }
       });
     } else {
       y += LH;
-      pdf.text('a.', ML + IM, y);
-      pdf.text('None identified.', ML + IM + pdf.getTextWidth('a.') + 4, y);
-      y += LH;
+      renderParagraph('a.', ML + IM, 'None identified.', IS);
     }
 
     // ========================================
     // PARAGRAPH 2: SUSTAIN
     // ========================================
-    y += LH;  // Blank line before paragraph
+    y += LH;
     pageBreak(LH * 4);
-    pdf.text('2.', ML, y);
-    pdf.setFont(fontName, 'bold');
-    pdf.text('SUSTAIN', ML + IM, y);
-    pdf.setFont(fontName, 'normal');
+
+    // "2.  Sustain.  This paragraph..." - text continues on same line
+    const sustainIntro = 'Sustain.  This paragraph discusses areas of the event that should be sustained because they were effective.';
+    renderParagraph('2.', ML, sustainIntro, IM);
 
     // SUSTAIN Topics
     if (data.sustainTopics && data.sustainTopics.length > 0) {
       data.sustainTopics.forEach((topic, index) => {
         y += LH;  // Blank line before each topic
         pageBreak(LH * 6);
+
         const letter = TextUtils.getLetter(index) + '.';
+        const topicText = topic.topic || '[Topic description]';
 
-        // Topic title
-        pdf.text(letter, ML + IM, y);
-        const topicText = TextUtils.ensureDoubleSpaces(topic.topic || '[Topic description]');
-        const topicX = ML + IM + pdf.getTextWidth(letter) + 4;
-        const topicWidth = CW - IM - pdf.getTextWidth(letter) - 4;
-        const topicLines = pdf.splitTextToSize(topicText, topicWidth);
-        topicLines.forEach((line, i) => {
-          if (i > 0) pageBreak(LH);
-          pdf.text(line, i === 0 ? topicX : ML, y);
-          y += LH;
-        });
+        // "a.  Topic text continues on same line..."
+        renderParagraph(letter, ML + IM, topicText, IS);
 
-        // (1) Discussion
-        pageBreak(LH * 3);
-        pdf.text('(1)', ML + IM + IS, y);
-        pdf.setFont(fontName, 'bold');
-        pdf.text('Discussion.', ML + IM + IS + pdf.getTextWidth('(1)') + 4, y);
-        pdf.setFont(fontName, 'normal');
-        y += LH;
-
+        // (1)  Discussion.  Text continues on same line...
         if (topic.discussion) {
-          const discText = TextUtils.ensureDoubleSpaces(topic.discussion);
-          const discLines = pdf.splitTextToSize(discText, CW);
-          discLines.forEach(line => {
-            pageBreak(LH);
-            pdf.text(line, ML, y);
-            y += LH;
-          });
+          pageBreak(LH * 2);
+          const discText = 'Discussion.  ' + topic.discussion;
+          renderParagraph('(1)', ML + IM + IS, discText, ISS);
         }
 
-        // (2) Recommendation
-        pageBreak(LH * 3);
-        pdf.text('(2)', ML + IM + IS, y);
-        pdf.setFont(fontName, 'bold');
-        pdf.text('Recommendation.', ML + IM + IS + pdf.getTextWidth('(2)') + 4, y);
-        pdf.setFont(fontName, 'normal');
-        y += LH;
-
+        // (2)  Recommendation.  Text continues on same line...
         if (topic.recommendation) {
-          const recText = TextUtils.ensureDoubleSpaces(topic.recommendation);
-          const recLines = pdf.splitTextToSize(recText, CW);
-          recLines.forEach(line => {
-            pageBreak(LH);
-            pdf.text(line, ML, y);
-            y += LH;
-          });
+          pageBreak(LH * 2);
+          const recText = 'Recommendation.  ' + topic.recommendation;
+          renderParagraph('(2)', ML + IM + IS, recText, ISS);
         }
       });
     } else {
       y += LH;
-      pdf.text('a.', ML + IM, y);
-      pdf.text('None identified.', ML + IM + pdf.getTextWidth('a.') + 4, y);
-      y += LH;
+      renderParagraph('a.', ML + IM, 'None identified.', IS);
     }
 
     // ========================================
@@ -321,18 +293,12 @@ const PDFGenerator = {
     // ========================================
     y += LH;
     pageBreak(LH * 3);
-    pdf.text('3.', ML, y);
-    const pocLine = TextUtils.ensureDoubleSpaces(AARBuilder.buildPOCLine(data));
-    const pocLines = pdf.splitTextToSize(pocLine, CW - IM);
-    pocLines.forEach((line, i) => {
-      pdf.text(line, i === 0 ? ML + IM : ML, y);
-      y += LH;
-    });
+    const pocText = AARBuilder.buildPOCLine(data);
+    renderParagraph('3.', ML, pocText, IM);
 
     // ========================================
     // SIGNATURE BLOCK
     // ========================================
-    // Ensure signature block doesn't orphan
     const sigHeight = LH * 5;
     if (y + sigHeight > PH - MB) {
       pageBreak(sigHeight);
@@ -360,8 +326,6 @@ const PDFGenerator = {
 
   /**
    * Generate PDF as Blob for preview
-   * @param {Object} data - AAR form data
-   * @returns {Blob} PDF blob
    */
   generateBlob(data) {
     const doc = this.generate(data);
@@ -370,7 +334,6 @@ const PDFGenerator = {
 
   /**
    * Export PDF to file
-   * @param {Object} data - AAR form data
    */
   exportPDF(data) {
     const doc = this.generate(data);
@@ -380,8 +343,6 @@ const PDFGenerator = {
 
   /**
    * Generate filename based on event name and date
-   * @param {Object} data - AAR form data
-   * @returns {string} Filename
    */
   generateFilename(data) {
     const date = DateUtils.formatNumeric(data.documentDate || new Date());

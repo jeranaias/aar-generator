@@ -119,51 +119,55 @@ const DOCXGenerator = {
     }));
     children.push(createPara('')); // Blank line
 
-    // IMPROVE Section
+    // IMPROVE Section - "1.  Improve.  This paragraph discusses..."
+    const improveIntro = 'Improve.  This paragraph discusses areas of the event that need to be improved.';
     children.push(new Paragraph({
       spacing: { after: 0, line: LINE_SPACING },
       children: [
-        new TextRun({ text: '1.  ', font: FONT, size: FONT_SIZE }),
-        new TextRun({ text: 'IMPROVE', font: FONT, size: FONT_SIZE, bold: true })
+        new TextRun({ text: '1.  ' + TextUtils.ensureDoubleSpaces(improveIntro), font: FONT, size: FONT_SIZE })
       ]
     }));
-    children.push(createPara('')); // Blank line
 
     if (data.improveTopics && data.improveTopics.length > 0) {
       data.improveTopics.forEach((topic, index) => {
+        children.push(createPara('')); // Blank line before each topic
         const letter = String.fromCharCode(97 + index);
         this.addTopicToDoc(children, letter, topic, FONT, FONT_SIZE, LINE_SPACING);
       });
     } else {
+      children.push(createPara('')); // Blank line
       children.push(createPara('    a.  None identified.'));
-      children.push(createPara(''));
     }
 
-    // SUSTAIN Section
+    // SUSTAIN Section - "2.  Sustain.  This paragraph discusses..."
+    children.push(createPara('')); // Blank line before section
+    const sustainIntro = 'Sustain.  This paragraph discusses areas of the event that should be sustained because they were effective.';
     children.push(new Paragraph({
       spacing: { after: 0, line: LINE_SPACING },
       children: [
-        new TextRun({ text: '2.  ', font: FONT, size: FONT_SIZE }),
-        new TextRun({ text: 'SUSTAIN', font: FONT, size: FONT_SIZE, bold: true })
+        new TextRun({ text: '2.  ' + TextUtils.ensureDoubleSpaces(sustainIntro), font: FONT, size: FONT_SIZE })
       ]
     }));
-    children.push(createPara('')); // Blank line
 
     if (data.sustainTopics && data.sustainTopics.length > 0) {
       data.sustainTopics.forEach((topic, index) => {
+        children.push(createPara('')); // Blank line before each topic
         const letter = String.fromCharCode(97 + index);
         this.addTopicToDoc(children, letter, topic, FONT, FONT_SIZE, LINE_SPACING);
       });
     } else {
+      children.push(createPara('')); // Blank line
       children.push(createPara('    a.  None identified.'));
-      children.push(createPara(''));
     }
 
-    // POC
+    // POC - "3.  Point of contact for this matter is..."
+    children.push(createPara('')); // Blank line before section
     const pocLine = TextUtils.ensureDoubleSpaces(AARBuilder.buildPOCLine(data));
     children.push(createPara(`3.  ${pocLine}`));
-    children.push(createPara('')); // Blank line
-    children.push(createPara('')); // Blank line
+    children.push(createPara('')); // Blank lines before signature
+    children.push(createPara(''));
+    children.push(createPara(''));
+    children.push(createPara(''));
 
     // Signature
     children.push(new Paragraph({
@@ -197,38 +201,35 @@ const DOCXGenerator = {
 
   /**
    * Add a topic section to the document
+   * Format matches NLG: label + text on same line, no bold, proper indentation
    */
   addTopicToDoc(children, letter, topic, FONT, FONT_SIZE, LINE_SPACING) {
-    const { Paragraph, TextRun, convertInchesToTwip } = docx;
+    const { Paragraph, TextRun } = docx;
 
-    // Topic title
+    // Topic title: "a.  Topic text continues on same line..."
+    const topicText = TextUtils.ensureDoubleSpaces(topic.topic) || '[Topic description]';
     children.push(new Paragraph({
       spacing: { after: 0, line: LINE_SPACING },
-      children: [new TextRun({ text: `    ${letter}.  ${TextUtils.ensureDoubleSpaces(topic.topic) || '[Topic description]'}`, font: FONT, size: FONT_SIZE })]
+      children: [new TextRun({ text: `    ${letter}.  ${topicText}`, font: FONT, size: FONT_SIZE })]
     }));
-    children.push(new Paragraph({ spacing: { after: 0, line: LINE_SPACING }, children: [] }));
 
-    // Discussion
-    children.push(new Paragraph({
-      spacing: { after: 0, line: LINE_SPACING },
-      children: [
-        new TextRun({ text: '        (1) ', font: FONT, size: FONT_SIZE }),
-        new TextRun({ text: 'Discussion.', font: FONT, size: FONT_SIZE, bold: true }),
-        new TextRun({ text: topic.discussion ? `  ${TextUtils.ensureDoubleSpaces(topic.discussion)}` : '', font: FONT, size: FONT_SIZE })
-      ]
-    }));
-    children.push(new Paragraph({ spacing: { after: 0, line: LINE_SPACING }, children: [] }));
+    // Discussion: "(1)  Discussion.  Text continues on same line..."
+    if (topic.discussion) {
+      const discText = 'Discussion.  ' + TextUtils.ensureDoubleSpaces(topic.discussion);
+      children.push(new Paragraph({
+        spacing: { after: 0, line: LINE_SPACING },
+        children: [new TextRun({ text: `        (1)  ${discText}`, font: FONT, size: FONT_SIZE })]
+      }));
+    }
 
-    // Recommendation
-    children.push(new Paragraph({
-      spacing: { after: 0, line: LINE_SPACING },
-      children: [
-        new TextRun({ text: '        (2) ', font: FONT, size: FONT_SIZE }),
-        new TextRun({ text: 'Recommendation.', font: FONT, size: FONT_SIZE, bold: true }),
-        new TextRun({ text: topic.recommendation ? `  ${TextUtils.ensureDoubleSpaces(topic.recommendation)}` : '', font: FONT, size: FONT_SIZE })
-      ]
-    }));
-    children.push(new Paragraph({ spacing: { after: 0, line: LINE_SPACING }, children: [] }));
+    // Recommendation: "(2)  Recommendation.  Text continues on same line..."
+    if (topic.recommendation) {
+      const recText = 'Recommendation.  ' + TextUtils.ensureDoubleSpaces(topic.recommendation);
+      children.push(new Paragraph({
+        spacing: { after: 0, line: LINE_SPACING },
+        children: [new TextRun({ text: `        (2)  ${recText}`, font: FONT, size: FONT_SIZE })]
+      }));
+    }
   },
 
   /**
