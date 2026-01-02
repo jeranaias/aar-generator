@@ -13,7 +13,7 @@ const DOCXGenerator = {
     // Document styles
     const FONT = 'Times New Roman';
     const FONT_SIZE = 24; // Half-points (12pt = 24)
-    const LINE_SPACING = 276; // ~1.15 line spacing
+    const LINE_SPACING = 280; // ~1.17 line spacing per SECNAV M-5216.5
 
     // Helper to create a paragraph
     const createPara = (text, options = {}) => {
@@ -160,7 +160,7 @@ const DOCXGenerator = {
     }
 
     // POC
-    const pocLine = AARBuilder.buildPOCLine(data);
+    const pocLine = TextUtils.ensureDoubleSpaces(AARBuilder.buildPOCLine(data));
     children.push(createPara(`3.  ${pocLine}`));
     children.push(createPara('')); // Blank line
     children.push(createPara('')); // Blank line
@@ -204,7 +204,7 @@ const DOCXGenerator = {
     // Topic title
     children.push(new Paragraph({
       spacing: { after: 0, line: LINE_SPACING },
-      children: [new TextRun({ text: `    ${letter}.  ${topic.topic || '[Topic description]'}`, font: FONT, size: FONT_SIZE })]
+      children: [new TextRun({ text: `    ${letter}.  ${TextUtils.ensureDoubleSpaces(topic.topic) || '[Topic description]'}`, font: FONT, size: FONT_SIZE })]
     }));
     children.push(new Paragraph({ spacing: { after: 0, line: LINE_SPACING }, children: [] }));
 
@@ -214,7 +214,7 @@ const DOCXGenerator = {
       children: [
         new TextRun({ text: '        (1) ', font: FONT, size: FONT_SIZE }),
         new TextRun({ text: 'Discussion.', font: FONT, size: FONT_SIZE, bold: true }),
-        new TextRun({ text: topic.discussion ? `  ${topic.discussion}` : '', font: FONT, size: FONT_SIZE })
+        new TextRun({ text: topic.discussion ? `  ${TextUtils.ensureDoubleSpaces(topic.discussion)}` : '', font: FONT, size: FONT_SIZE })
       ]
     }));
     children.push(new Paragraph({ spacing: { after: 0, line: LINE_SPACING }, children: [] }));
@@ -225,7 +225,7 @@ const DOCXGenerator = {
       children: [
         new TextRun({ text: '        (2) ', font: FONT, size: FONT_SIZE }),
         new TextRun({ text: 'Recommendation.', font: FONT, size: FONT_SIZE, bold: true }),
-        new TextRun({ text: topic.recommendation ? `  ${topic.recommendation}` : '', font: FONT, size: FONT_SIZE })
+        new TextRun({ text: topic.recommendation ? `  ${TextUtils.ensureDoubleSpaces(topic.recommendation)}` : '', font: FONT, size: FONT_SIZE })
       ]
     }));
     children.push(new Paragraph({ spacing: { after: 0, line: LINE_SPACING }, children: [] }));

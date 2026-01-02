@@ -26,11 +26,12 @@ const PDFGenerator = {
     // Font settings - Times New Roman, 12pt per SECNAV M-5216.5
     const fontName = 'times';
     const fontSize = 12;
-    const LH = fontSize * 1.15;  // Line height
+    const LH = TextUtils.getLineHeight(fontSize);  // Proper 1.17x line height
 
-    // Paragraph indentation
-    const INDENT_SUB = 15;       // Sub-paragraph indent
-    const INDENT_SUBSUB = 16;    // Sub-sub indent
+    // Paragraph indentation per SECNAV M-5216.5
+    const IM = 15;        // Main paragraph text indent (after "1.")
+    const IS = 16;        // Sub-paragraph indent (after "a.")
+    const ISS = 18;       // Sub-sub indent (after "(1)")
 
     let y = 54;           // Start position (letterhead area)
     let pageNum = 1;
@@ -61,22 +62,21 @@ const PDFGenerator = {
     }
 
     /**
-     * Add wrapped text with proper indentation
+     * Add wrapped text with double spacing after periods
      */
-    function addWrappedText(text, indent = 0, firstLineX = null) {
+    function addText(text, x, maxWidth) {
       if (!text) return;
-      const maxWidth = CW - indent;
-      const lines = pdf.splitTextToSize(text, maxWidth);
-      lines.forEach((line, i) => {
+      const processed = TextUtils.ensureDoubleSpaces(text);
+      const lines = pdf.splitTextToSize(processed, maxWidth);
+      lines.forEach((line) => {
         pageBreak(LH);
-        const x = (i === 0 && firstLineX !== null) ? firstLineX : ML + indent;
         pdf.text(line, x, y);
         y += LH;
       });
     }
 
     // ========================================
-    // LETTERHEAD
+    // LETTERHEAD (centered, smaller font)
     // ========================================
     pdf.setFont(fontName, 'bold');
     pdf.setFontSize(10);
@@ -106,7 +106,7 @@ const PDFGenerator = {
     pdf.setFontSize(fontSize);
     const senderX = PW - MR - 72;
 
-    // "IN REPLY REFER TO:" label
+    // "IN REPLY REFER TO:" label (6pt, positioned above SSIC)
     pdf.setFontSize(6);
     pdf.text('IN REPLY REFER TO:', senderX, y - 11);
     pdf.setFontSize(fontSize);
@@ -156,9 +156,10 @@ const PDFGenerator = {
     y += LH;
     pageBreak(LH * 3);
     pdf.text('Ref:', ML, y);
-    pdf.text('(a) MCO 3504.1 Marine Corps Lessons Learned Program (MCLLP)', ML + TAB, y);
+    const refText = '(a)  MCO 3504.1 Marine Corps Lessons Learned Program (MCLLP)';
+    pdf.text(refText, ML + TAB, y);
     y += LH;
-    pdf.text('and the Marine Corps Center for Lessons Learned (MCCLL)', ML + TAB + 20, y);
+    pdf.text('     and the Marine Corps Center for Lessons Learned (MCCLL)', ML + TAB, y);
     y += LH;
 
     // ========================================
@@ -168,7 +169,7 @@ const PDFGenerator = {
     pageBreak(LH * 4);
     pdf.text('1.', ML, y);
     pdf.setFont(fontName, 'bold');
-    pdf.text('IMPROVE', ML + INDENT_SUB, y);
+    pdf.text('IMPROVE', ML + IM, y);
     pdf.setFont(fontName, 'normal');
     y += LH;
 
@@ -177,28 +178,31 @@ const PDFGenerator = {
       data.improveTopics.forEach((topic, index) => {
         y += LH;
         pageBreak(LH * 6);
-        const letter = String.fromCharCode(97 + index) + '.';
+        const letter = TextUtils.getLetter(index) + '.';
 
         // Topic title
-        pdf.text(letter, ML + INDENT_SUB, y);
-        const topicText = topic.topic || '[Topic description]';
-        const topicX = ML + INDENT_SUB + pdf.getTextWidth(letter) + 4;
-        const topicLines = pdf.splitTextToSize(topicText, CW - INDENT_SUB - pdf.getTextWidth(letter) - 4);
+        pdf.text(letter, ML + IM, y);
+        const topicText = TextUtils.ensureDoubleSpaces(topic.topic || '[Topic description]');
+        const topicX = ML + IM + pdf.getTextWidth(letter) + 4;
+        const topicWidth = CW - IM - pdf.getTextWidth(letter) - 4;
+        const topicLines = pdf.splitTextToSize(topicText, topicWidth);
         topicLines.forEach((line, i) => {
+          if (i > 0) pageBreak(LH);
           pdf.text(line, i === 0 ? topicX : ML, y);
           y += LH;
         });
 
         // (1) Discussion
         pageBreak(LH * 3);
-        pdf.text('(1)', ML + INDENT_SUB + INDENT_SUBSUB, y);
+        pdf.text('(1)', ML + IM + IS, y);
         pdf.setFont(fontName, 'bold');
-        pdf.text('Discussion.', ML + INDENT_SUB + INDENT_SUBSUB + pdf.getTextWidth('(1)') + 4, y);
+        pdf.text('Discussion.', ML + IM + IS + pdf.getTextWidth('(1)') + 4, y);
         pdf.setFont(fontName, 'normal');
         y += LH;
 
         if (topic.discussion) {
-          const discLines = pdf.splitTextToSize(topic.discussion, CW);
+          const discText = TextUtils.ensureDoubleSpaces(topic.discussion);
+          const discLines = pdf.splitTextToSize(discText, CW);
           discLines.forEach(line => {
             pageBreak(LH);
             pdf.text(line, ML, y);
@@ -208,14 +212,15 @@ const PDFGenerator = {
 
         // (2) Recommendation
         pageBreak(LH * 3);
-        pdf.text('(2)', ML + INDENT_SUB + INDENT_SUBSUB, y);
+        pdf.text('(2)', ML + IM + IS, y);
         pdf.setFont(fontName, 'bold');
-        pdf.text('Recommendation.', ML + INDENT_SUB + INDENT_SUBSUB + pdf.getTextWidth('(2)') + 4, y);
+        pdf.text('Recommendation.', ML + IM + IS + pdf.getTextWidth('(2)') + 4, y);
         pdf.setFont(fontName, 'normal');
         y += LH;
 
         if (topic.recommendation) {
-          const recLines = pdf.splitTextToSize(topic.recommendation, CW);
+          const recText = TextUtils.ensureDoubleSpaces(topic.recommendation);
+          const recLines = pdf.splitTextToSize(recText, CW);
           recLines.forEach(line => {
             pageBreak(LH);
             pdf.text(line, ML, y);
@@ -225,8 +230,8 @@ const PDFGenerator = {
       });
     } else {
       y += LH;
-      pdf.text('a.', ML + INDENT_SUB, y);
-      pdf.text('None identified.', ML + INDENT_SUB + pdf.getTextWidth('a.') + 4, y);
+      pdf.text('a.', ML + IM, y);
+      pdf.text('None identified.', ML + IM + pdf.getTextWidth('a.') + 4, y);
       y += LH;
     }
 
@@ -237,7 +242,7 @@ const PDFGenerator = {
     pageBreak(LH * 4);
     pdf.text('2.', ML, y);
     pdf.setFont(fontName, 'bold');
-    pdf.text('SUSTAIN', ML + INDENT_SUB, y);
+    pdf.text('SUSTAIN', ML + IM, y);
     pdf.setFont(fontName, 'normal');
     y += LH;
 
@@ -246,28 +251,31 @@ const PDFGenerator = {
       data.sustainTopics.forEach((topic, index) => {
         y += LH;
         pageBreak(LH * 6);
-        const letter = String.fromCharCode(97 + index) + '.';
+        const letter = TextUtils.getLetter(index) + '.';
 
         // Topic title
-        pdf.text(letter, ML + INDENT_SUB, y);
-        const topicText = topic.topic || '[Topic description]';
-        const topicX = ML + INDENT_SUB + pdf.getTextWidth(letter) + 4;
-        const topicLines = pdf.splitTextToSize(topicText, CW - INDENT_SUB - pdf.getTextWidth(letter) - 4);
+        pdf.text(letter, ML + IM, y);
+        const topicText = TextUtils.ensureDoubleSpaces(topic.topic || '[Topic description]');
+        const topicX = ML + IM + pdf.getTextWidth(letter) + 4;
+        const topicWidth = CW - IM - pdf.getTextWidth(letter) - 4;
+        const topicLines = pdf.splitTextToSize(topicText, topicWidth);
         topicLines.forEach((line, i) => {
+          if (i > 0) pageBreak(LH);
           pdf.text(line, i === 0 ? topicX : ML, y);
           y += LH;
         });
 
         // (1) Discussion
         pageBreak(LH * 3);
-        pdf.text('(1)', ML + INDENT_SUB + INDENT_SUBSUB, y);
+        pdf.text('(1)', ML + IM + IS, y);
         pdf.setFont(fontName, 'bold');
-        pdf.text('Discussion.', ML + INDENT_SUB + INDENT_SUBSUB + pdf.getTextWidth('(1)') + 4, y);
+        pdf.text('Discussion.', ML + IM + IS + pdf.getTextWidth('(1)') + 4, y);
         pdf.setFont(fontName, 'normal');
         y += LH;
 
         if (topic.discussion) {
-          const discLines = pdf.splitTextToSize(topic.discussion, CW);
+          const discText = TextUtils.ensureDoubleSpaces(topic.discussion);
+          const discLines = pdf.splitTextToSize(discText, CW);
           discLines.forEach(line => {
             pageBreak(LH);
             pdf.text(line, ML, y);
@@ -277,14 +285,15 @@ const PDFGenerator = {
 
         // (2) Recommendation
         pageBreak(LH * 3);
-        pdf.text('(2)', ML + INDENT_SUB + INDENT_SUBSUB, y);
+        pdf.text('(2)', ML + IM + IS, y);
         pdf.setFont(fontName, 'bold');
-        pdf.text('Recommendation.', ML + INDENT_SUB + INDENT_SUBSUB + pdf.getTextWidth('(2)') + 4, y);
+        pdf.text('Recommendation.', ML + IM + IS + pdf.getTextWidth('(2)') + 4, y);
         pdf.setFont(fontName, 'normal');
         y += LH;
 
         if (topic.recommendation) {
-          const recLines = pdf.splitTextToSize(topic.recommendation, CW);
+          const recText = TextUtils.ensureDoubleSpaces(topic.recommendation);
+          const recLines = pdf.splitTextToSize(recText, CW);
           recLines.forEach(line => {
             pageBreak(LH);
             pdf.text(line, ML, y);
@@ -294,8 +303,8 @@ const PDFGenerator = {
       });
     } else {
       y += LH;
-      pdf.text('a.', ML + INDENT_SUB, y);
-      pdf.text('None identified.', ML + INDENT_SUB + pdf.getTextWidth('a.') + 4, y);
+      pdf.text('a.', ML + IM, y);
+      pdf.text('None identified.', ML + IM + pdf.getTextWidth('a.') + 4, y);
       y += LH;
     }
 
@@ -305,10 +314,10 @@ const PDFGenerator = {
     y += LH;
     pageBreak(LH * 3);
     pdf.text('3.', ML, y);
-    const pocLine = AARBuilder.buildPOCLine(data);
-    const pocLines = pdf.splitTextToSize(pocLine, CW - INDENT_SUB);
+    const pocLine = TextUtils.ensureDoubleSpaces(AARBuilder.buildPOCLine(data));
+    const pocLines = pdf.splitTextToSize(pocLine, CW - IM);
     pocLines.forEach((line, i) => {
-      pdf.text(line, i === 0 ? ML + INDENT_SUB : ML, y);
+      pdf.text(line, i === 0 ? ML + IM : ML, y);
       y += LH;
     });
 
