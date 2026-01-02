@@ -1,19 +1,21 @@
 /* ===================================
    AAR Generator - Styles
-   Navy/Gold Military Theme
+   Dark Red/Maroon Military Theme
    =================================== */
 
 /* CSS Variables */
 :root {
-  /* Primary Colors - Navy/Gold Military */
-  --primary: #003366;
-  --primary-light: #004488;
-  --primary-dark: #002244;
-  --accent: #b89d5b;
-  --accent-light: #d4bc7c;
-  --accent-dark: #9a8248;
+  /* Primary Colors - Dark Red/Maroon */
+  --primary: #4A0000;
+  --primary-light: #6B0000;
+  --primary-dark: #2D0000;
+  --accent: #FFD700;
+  --accent-light: #FFE44D;
+  --accent-dark: #D4AF00;
 
-  /* Marine Corps Red for accents */
+  /* Button Colors */
+  --btn-primary: #DC3545;
+  --btn-primary-hover: #C82333;
   --usmc-red: #8B0000;
   --usmc-red-light: #A52A2A;
 
@@ -152,7 +154,7 @@ body {
 }
 
 ::selection {
-  background-color: var(--primary);
+  background-color: var(--btn-primary);
   color: var(--white);
 }
 
@@ -250,15 +252,40 @@ body {
 }
 
 .header-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--primary-dark);
+  background: var(--btn-primary);
+  border-color: var(--btn-primary);
+  color: var(--white);
+}
+
+.header__subtitle {
+  color: var(--accent);
 }
 
 @media (min-width: 768px) {
   .header__title {
     font-size: var(--text-2xl);
   }
+}
+
+/* ===================================
+   Tagline Bar
+   =================================== */
+.tagline-bar {
+  background: var(--gray-800);
+  color: var(--gray-300);
+  text-align: center;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.tagline-bar a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: var(--font-medium);
+}
+
+.tagline-bar a:hover {
+  text-decoration: underline;
 }
 
 /* ===================================
@@ -295,6 +322,7 @@ body {
 .card {
   background: var(--surface);
   border: 1px solid var(--border-light);
+  border-left: 4px solid var(--accent);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-sm);
@@ -304,20 +332,22 @@ body {
 .card__header {
   margin-bottom: var(--space-5);
   padding-bottom: var(--space-4);
-  border-bottom: 2px solid var(--accent);
+  border-bottom: none;
 }
 
 .card__title {
   font-size: var(--text-lg);
   font-weight: var(--font-bold);
-  color: var(--primary);
+  color: var(--accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
 .card__title-icon {
-  font-size: var(--text-xl);
+  display: none;
 }
 
 .card__subtitle {
@@ -384,13 +414,13 @@ body {
 }
 
 .input:hover {
-  border-color: var(--primary-light);
+  border-color: var(--btn-primary);
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.15);
+  border-color: var(--btn-primary);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
 }
 
 .input::placeholder {
@@ -460,12 +490,12 @@ body {
 }
 
 .btn--primary {
-  background: var(--primary);
+  background: var(--btn-primary);
   color: var(--white);
 }
 
 .btn--primary:hover:not(:disabled) {
-  background: var(--primary-light);
+  background: var(--btn-primary-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -499,8 +529,8 @@ body {
 
 .btn--outline:hover:not(:disabled) {
   background: var(--bg-secondary);
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--btn-primary);
+  color: var(--btn-primary);
 }
 
 .btn--ghost {
@@ -553,18 +583,18 @@ body {
 }
 
 .topic-card:hover {
-  border-color: var(--primary-light);
+  border-color: var(--accent);
   box-shadow: var(--shadow-md);
 }
 
 .topic-card.dragging {
   opacity: 0.5;
-  border: 2px dashed var(--primary);
+  border: 2px dashed var(--btn-primary);
 }
 
 .topic-card.drag-over {
   border-color: var(--accent);
-  background: rgba(184, 157, 91, 0.1);
+  background: rgba(255, 215, 0, 0.1);
 }
 
 .topic-header {
@@ -592,7 +622,7 @@ body {
 }
 
 .drag-handle:hover {
-  color: var(--primary);
+  color: var(--btn-primary);
 }
 
 .drag-handle:active {
@@ -602,7 +632,7 @@ body {
 .topic-label {
   font-weight: var(--font-bold);
   font-size: var(--text-base);
-  color: var(--primary);
+  color: var(--accent-dark);
 }
 
 .topic-actions {
@@ -632,8 +662,9 @@ body {
    Guided Prompts
    =================================== */
 .guided-prompts {
-  background: linear-gradient(135deg, rgba(0, 51, 102, 0.05) 0%, rgba(184, 157, 91, 0.05) 100%);
-  border: 1px solid var(--primary-light);
+  background: linear-gradient(135deg, rgba(74, 0, 0, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--accent);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-4);
   overflow: hidden;
@@ -642,7 +673,7 @@ body {
 .guided-prompts summary {
   padding: var(--space-3) var(--space-4);
   cursor: pointer;
-  color: var(--primary);
+  color: var(--accent-dark);
   font-weight: var(--font-medium);
   font-size: var(--text-sm);
   display: flex;
@@ -652,11 +683,11 @@ body {
 }
 
 .guided-prompts summary:hover {
-  background: rgba(0, 51, 102, 0.05);
+  background: rgba(255, 215, 0, 0.1);
 }
 
 .guided-prompts summary::marker {
-  color: var(--primary);
+  color: var(--accent-dark);
 }
 
 .guided-prompts .prompt-list {
@@ -674,9 +705,10 @@ body {
    Actions Section
    =================================== */
 .actions-card {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: var(--gray-800);
   color: var(--white);
   border: none;
+  border-left: 4px solid var(--accent);
 }
 
 .actions-card .card__header {
@@ -684,7 +716,7 @@ body {
 }
 
 .actions-card .card__title {
-  color: var(--white);
+  color: var(--accent);
 }
 
 .action-buttons {
@@ -695,12 +727,12 @@ body {
 }
 
 .action-buttons .btn--primary {
-  background: var(--accent);
-  color: var(--primary-dark);
+  background: var(--btn-primary);
+  color: var(--white);
 }
 
 .action-buttons .btn--primary:hover:not(:disabled) {
-  background: var(--accent-light);
+  background: var(--btn-primary-hover);
 }
 
 .action-buttons .btn--outline {
@@ -871,14 +903,14 @@ body {
 }
 
 .footer a {
-  color: var(--primary);
+  color: var(--btn-primary);
   text-decoration: none;
   font-weight: var(--font-medium);
   transition: color 0.15s ease;
 }
 
 .footer a:hover {
-  color: var(--accent);
+  color: var(--btn-primary-hover);
   text-decoration: underline;
 }
 

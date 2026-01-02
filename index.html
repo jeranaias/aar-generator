@@ -8,7 +8,7 @@
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#003366">
+  <meta name="theme-color" content="#4A0000">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
 
   <!-- Styles -->
@@ -22,7 +22,6 @@
   <header class="header no-print">
     <div class="header__container">
       <div class="header__brand">
-        <span class="header__logo" aria-hidden="true">&#9734;</span>
         <div>
           <h1 class="header__title">After Action Report Generator</h1>
           <p class="header__subtitle">TECOM Format &bull; MCO 3504.1 Compliant</p>
@@ -30,7 +29,7 @@
       </div>
       <div class="header__actions">
         <button type="button" id="previewToggle" class="header-btn" aria-pressed="false">
-          <span aria-hidden="true">&#128196;</span> Live Preview
+          Live Preview
         </button>
         <button type="button" id="theme-toggle" class="header-btn" aria-label="Toggle theme">
           <span class="theme-icon" aria-hidden="true">&#9788;</span>
@@ -39,6 +38,11 @@
     </div>
   </header>
 
+  <!-- Tagline Bar -->
+  <div class="tagline-bar no-print">
+    Free tool for Marines &bull; <a href="https://github.com/jeranaias/aar-generator#readme">Documentation &amp; Guide &rarr;</a>
+  </div>
+
   <!-- Main Content -->
   <main id="main" class="main-content">
     <form id="aar-form" class="aar-form" novalidate>
@@ -46,10 +50,7 @@
       <!-- Section 1: Unit Information -->
       <section class="card">
         <div class="card__header">
-          <h2 class="card__title">
-            <span class="card__title-icon" aria-hidden="true">&#127970;</span>
-            Unit Information
-          </h2>
+          <h2 class="card__title">Unit Information</h2>
         </div>
         <div class="form-grid">
           <div class="form-group form-group--full">
@@ -82,10 +83,7 @@
       <!-- Section 2: From / To -->
       <section class="card">
         <div class="card__header">
-          <h2 class="card__title">
-            <span class="card__title-icon" aria-hidden="true">&#128100;</span>
-            From / To
-          </h2>
+          <h2 class="card__title">From / To</h2>
         </div>
         <div class="form-grid">
           <div class="form-group">
@@ -144,10 +142,7 @@
       <!-- Section 3: Event Details -->
       <section class="card">
         <div class="card__header">
-          <h2 class="card__title">
-            <span class="card__title-icon" aria-hidden="true">&#128197;</span>
-            Event Details
-          </h2>
+          <h2 class="card__title">Event Details</h2>
         </div>
         <div class="form-grid">
           <div class="form-group form-group--full">
@@ -168,15 +163,12 @@
       <!-- Section 4: IMPROVE Topics -->
       <section class="card">
         <div class="card__header">
-          <h2 class="card__title">
-            <span class="card__title-icon" aria-hidden="true">&#128200;</span>
-            1. IMPROVE
-          </h2>
+          <h2 class="card__title">1. Improve</h2>
           <p class="card__subtitle">Areas that need improvement. Drag topics to reorder.</p>
         </div>
 
         <details class="guided-prompts">
-          <summary>&#128161; Writing Prompts</summary>
+          <summary>Writing Prompts</summary>
           <ul class="prompt-list">
             <li><strong>What happened?</strong> Specific incident or observation</li>
             <li><strong>When/where?</strong> Phase of operation, location</li>
@@ -197,15 +189,12 @@
       <!-- Section 5: SUSTAIN Topics -->
       <section class="card">
         <div class="card__header">
-          <h2 class="card__title">
-            <span class="card__title-icon" aria-hidden="true">&#9989;</span>
-            2. SUSTAIN
-          </h2>
+          <h2 class="card__title">2. Sustain</h2>
           <p class="card__subtitle">Areas that were effective and should continue. Drag topics to reorder.</p>
         </div>
 
         <details class="guided-prompts">
-          <summary>&#128161; Writing Prompts</summary>
+          <summary>Writing Prompts</summary>
           <ul class="prompt-list">
             <li><strong>What worked well?</strong> Specific actions or procedures</li>
             <li><strong>How did it help?</strong> Contribution to mission success</li>
@@ -226,10 +215,7 @@
       <!-- Section 6: POC & Signature -->
       <section class="card">
         <div class="card__header">
-          <h2 class="card__title">
-            <span class="card__title-icon" aria-hidden="true">&#9997;</span>
-            Point of Contact & Signature
-          </h2>
+          <h2 class="card__title">Point of Contact & Signature</h2>
         </div>
         <div class="form-grid">
           <div class="form-group">
@@ -293,29 +279,26 @@
       <!-- Actions -->
       <section class="card actions-card no-print">
         <div class="card__header">
-          <h2 class="card__title">
-            <span class="card__title-icon" aria-hidden="true">&#128190;</span>
-            Export & Save
-          </h2>
+          <h2 class="card__title">Export & Save</h2>
         </div>
         <div class="action-buttons">
           <button type="button" id="exportPdfBtn" class="btn btn--primary btn--lg">
-            <span aria-hidden="true">&#128196;</span> Export PDF
+            Export PDF
           </button>
           <button type="button" id="exportWordBtn" class="btn btn--primary btn--lg">
-            <span aria-hidden="true">&#128195;</span> Export Word
+            Export Word
           </button>
           <button type="button" id="copyBtn" class="btn btn--outline">
-            <span aria-hidden="true">&#128203;</span> Copy Text
+            Copy Text
           </button>
           <button type="button" id="saveDraftBtn" class="btn btn--outline">
-            <span aria-hidden="true">&#128190;</span> Save Draft
+            Save Draft
           </button>
           <button type="button" id="loadDraftBtn" class="btn btn--outline">
-            <span aria-hidden="true">&#128194;</span> Load Draft
+            Load Draft
           </button>
           <button type="button" id="clearAllBtn" class="btn btn--ghost">
-            <span aria-hidden="true">&#128465;</span> Clear All
+            Clear All
           </button>
         </div>
       </section>
@@ -352,7 +335,7 @@
   <!-- Live Preview Pane -->
   <div id="livePreviewPane" class="live-preview-pane">
     <div class="preview-header">
-      <span><span aria-hidden="true">&#128196;</span> Live Preview</span>
+      <span>Live Preview</span>
       <button type="button" class="preview-close" id="previewClose" aria-label="Close preview">&times;</button>
     </div>
     <div id="previewLoading" class="preview-loading">
