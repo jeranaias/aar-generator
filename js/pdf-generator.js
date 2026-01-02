@@ -76,19 +76,25 @@ const PDFGenerator = {
     }
 
     // ========================================
-    // LETTERHEAD (centered, smaller font)
+    // LETTERHEAD (centered, per SECNAV M-5216.5)
     // ========================================
+    // Service name - bold, slightly smaller than body
     pdf.setFont(fontName, 'bold');
-    pdf.setFontSize(10);
+    pdf.setFontSize(fontSize - 2);  // 10pt
     pdf.text('UNITED STATES MARINE CORPS', PW / 2, y, { align: 'center' });
     y += 12;
 
-    pdf.setFont(fontName, 'normal');
-    pdf.setFontSize(8);
+    // Unit name - bold (organizational identification)
     if (data.unitName) {
+      pdf.setFont(fontName, 'bold');
+      pdf.setFontSize(fontSize - 4);  // 8pt
       pdf.text(data.unitName.toUpperCase(), PW / 2, y, { align: 'center' });
       y += 10;
     }
+
+    // Unit address - normal weight
+    pdf.setFont(fontName, 'normal');
+    pdf.setFontSize(fontSize - 4);  // 8pt
     if (data.unitAddress1) {
       pdf.text(data.unitAddress1.toUpperCase(), PW / 2, y, { align: 'center' });
       y += 10;
@@ -151,32 +157,35 @@ const PDFGenerator = {
     });
 
     // ========================================
-    // REFERENCE
+    // REFERENCE (per SECNAV M-5216.5 format)
     // ========================================
     y += LH;
     pageBreak(LH * 3);
     pdf.text('Ref:', ML, y);
-    const refText = '(a)  MCO 3504.1 Marine Corps Lessons Learned Program (MCLLP)';
-    pdf.text(refText, ML + TAB, y);
-    y += LH;
-    pdf.text('     and the Marine Corps Center for Lessons Learned (MCCLL)', ML + TAB, y);
-    y += LH;
+    // Reference with two spaces after designator, wrapped properly
+    const refLines = pdf.splitTextToSize(
+      '(a)  MCO 3504.1 Marine Corps Lessons Learned Program (MCLLP) and the Marine Corps Center for Lessons Learned (MCCLL)',
+      CW - TAB
+    );
+    refLines.forEach((line) => {
+      pdf.text(line, ML + TAB, y);
+      y += LH;
+    });
 
     // ========================================
     // PARAGRAPH 1: IMPROVE
     // ========================================
-    y += LH;
+    y += LH;  // Blank line before paragraph
     pageBreak(LH * 4);
     pdf.text('1.', ML, y);
     pdf.setFont(fontName, 'bold');
     pdf.text('IMPROVE', ML + IM, y);
     pdf.setFont(fontName, 'normal');
-    y += LH;
 
     // IMPROVE Topics
     if (data.improveTopics && data.improveTopics.length > 0) {
       data.improveTopics.forEach((topic, index) => {
-        y += LH;
+        y += LH;  // Blank line before each topic
         pageBreak(LH * 6);
         const letter = TextUtils.getLetter(index) + '.';
 
@@ -238,18 +247,17 @@ const PDFGenerator = {
     // ========================================
     // PARAGRAPH 2: SUSTAIN
     // ========================================
-    y += LH;
+    y += LH;  // Blank line before paragraph
     pageBreak(LH * 4);
     pdf.text('2.', ML, y);
     pdf.setFont(fontName, 'bold');
     pdf.text('SUSTAIN', ML + IM, y);
     pdf.setFont(fontName, 'normal');
-    y += LH;
 
     // SUSTAIN Topics
     if (data.sustainTopics && data.sustainTopics.length > 0) {
       data.sustainTopics.forEach((topic, index) => {
-        y += LH;
+        y += LH;  // Blank line before each topic
         pageBreak(LH * 6);
         const letter = TextUtils.getLetter(index) + '.';
 
