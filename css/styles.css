@@ -1,61 +1,66 @@
 /* ===================================
    AAR Generator - Styles
-   Dark Red/Maroon Military Theme
+   OSMEAC-Standard Color Scheme
    =================================== */
 
-/* CSS Variables */
+/* CSS Variables - Dark Mode (Default) */
 :root {
-  /* Primary Colors - Dark Red/Maroon */
-  --primary: #4A0000;
-  --primary-light: #6B0000;
-  --primary-dark: #2D0000;
-  --accent: #FFD700;
-  --accent-light: #FFE44D;
-  --accent-dark: #D4AF00;
-
-  /* Button Colors */
+  /* Theme Colors */
+  --bg-body: #1A1A1A;
+  --bg-card: #2D2D2D;
+  --bg-input: #3A3A3A;
+  --border-input: #6A6A6A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #CCCCCC;
+  --text-muted: #AAAAAA;
+  --accent-red: #DC4444;
+  --accent-yellow: #EAB308;
   --btn-primary: #DC3545;
   --btn-primary-hover: #C82333;
-  --usmc-red: #8B0000;
-  --usmc-red-light: #A52A2A;
+  --header-gradient-start: #5C1A1A;
+  --header-gradient-end: #6C2A2A;
 
-  /* Neutrals */
+  /* Legacy variable mappings */
+  --bg-primary: var(--bg-input);
+  --bg-secondary: var(--bg-body);
+  --surface: var(--bg-card);
+  --text-tertiary: var(--text-muted);
+  --border-light: #404040;
+  --border-medium: var(--border-input);
+  --accent: var(--accent-yellow);
+  --accent-light: #FCD34D;
+  --accent-dark: #CA8A04;
+  --primary: var(--header-gradient-start);
+  --primary-light: var(--header-gradient-end);
+  --primary-dark: #4A1414;
+
+  /* Grays */
   --white: #FFFFFF;
-  --gray-50: #f5f5f0;
-  --gray-100: #e8e8e3;
-  --gray-200: #d4d4cf;
-  --gray-300: #b8b8b3;
-  --gray-400: #8c8c87;
-  --gray-500: #6b6b66;
-  --gray-600: #4a4a45;
-  --gray-700: #343a40;
-  --gray-800: #212529;
-  --gray-900: #111111;
+  --gray-50: #2d2d2d;
+  --gray-100: #383838;
+  --gray-200: #4a4a4a;
+  --gray-300: #6a6a6a;
+  --gray-400: #8a8a8a;
+  --gray-500: #aaaaaa;
+  --gray-600: #cccccc;
+  --gray-700: #1a1a1a;
+  --gray-800: #121212;
+  --gray-900: #0a0a0a;
 
   /* Status Colors */
   --success: #28a745;
-  --success-light: #d4edda;
+  --success-light: #1a3d24;
   --warning: #ffc107;
-  --warning-light: #fff3cd;
+  --warning-light: #3d3010;
   --error: #dc3545;
-  --error-light: #f8d7da;
+  --error-light: #3d1a1d;
   --info: #17a2b8;
-  --info-light: #d1ecf1;
-
-  /* Semantic Colors */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #f5f5f0;
-  --surface: #FFFFFF;
-  --text-primary: #212529;
-  --text-secondary: #4a4a45;
-  --text-tertiary: #6b6b66;
-  --border-light: #d4d4cf;
-  --border-medium: #b8b8b3;
+  --info-light: #1a3d42;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
 
   /* Typography */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -91,50 +96,95 @@
   --radius-full: 9999px;
 }
 
-/* Dark Mode */
-[data-theme="dark"] {
-  --primary: #6B0000;
-  --primary-light: #8B0000;
-  --primary-dark: #4A0000;
-  --accent: #FFD700;
-  --accent-light: #FFE44D;
-  --accent-dark: #D4AF00;
+/* Light Mode */
+[data-theme="light"] {
+  --bg-body: #F5F5F0;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --border-input: #DEE2E6;
+  --text-primary: #343A40;
+  --text-secondary: #495057;
+  --text-muted: #6C757D;
+  --accent-red: #8B0000;
+  --accent-yellow: #8B0000;
   --btn-primary: #DC3545;
   --btn-primary-hover: #C82333;
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #242424;
-  --surface: #2d2d2d;
-  --text-primary: #f5f5f0;
-  --text-secondary: #d4d4cf;
-  --text-tertiary: #b8b8b3;
-  --border-light: #404040;
-  --border-medium: #555555;
-  --gray-50: #2d2d2d;
-  --gray-100: #383838;
-  --gray-700: #1a1a1a;
-  --gray-800: #121212;
+
+  /* Legacy mappings for light */
+  --bg-primary: var(--bg-input);
+  --bg-secondary: var(--bg-body);
+  --surface: var(--bg-card);
+  --text-tertiary: var(--text-muted);
+  --border-light: #DEE2E6;
+  --border-medium: #CED4DA;
+  --accent: var(--accent-yellow);
+  --accent-light: #A52A2A;
+  --accent-dark: #660000;
+
+  /* Grays for light */
+  --gray-50: #F8F9FA;
+  --gray-100: #E9ECEF;
+  --gray-200: #DEE2E6;
+  --gray-300: #CED4DA;
+  --gray-400: #ADB5BD;
+  --gray-500: #6C757D;
+  --gray-600: #495057;
+  --gray-700: #343A40;
+  --gray-800: #212529;
+
+  /* Status for light */
+  --success-light: #d4edda;
+  --warning-light: #fff3cd;
+  --error-light: #f8d7da;
+  --info-light: #d1ecf1;
+
+  /* Shadows for light */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Night Mode (Tactical Red) */
 [data-theme="night"] {
-  --primary: #cc0000;
-  --primary-light: #ff0000;
-  --primary-dark: #990000;
-  --accent: #ff0000;
-  --accent-light: #ff3333;
-  --accent-dark: #cc0000;
-  --btn-primary: #ff0000;
-  --btn-primary-hover: #cc0000;
-  --bg-primary: #000000;
-  --bg-secondary: #0a0000;
-  --surface: #110000;
-  --text-primary: #ff0000;
-  --text-secondary: #cc0000;
-  --text-tertiary: #990000;
+  --bg-body: #1A1A1A;
+  --bg-card: #2D2D2D;
+  --bg-input: #3A3A3A;
+  --border-input: #550000;
+  --text-primary: #DC4444;
+  --text-secondary: #DC4444;
+  --text-muted: #AA3333;
+  --accent-red: #DC4444;
+  --accent-yellow: #DC4444;
+  --btn-primary: #DC4444;
+  --btn-primary-hover: #AA3333;
+  --header-gradient-start: #4A0000;
+  --header-gradient-end: #5A0000;
+
+  /* Legacy mappings for night */
+  --bg-primary: var(--bg-input);
+  --bg-secondary: var(--bg-body);
+  --surface: var(--bg-card);
+  --text-tertiary: var(--text-muted);
   --border-light: #330000;
   --border-medium: #550000;
-  --gray-700: #0a0000;
-  --gray-800: #050000;
+  --accent: #DC4444;
+  --accent-light: #FF5555;
+  --accent-dark: #AA3333;
+  --primary: #AA3333;
+  --primary-light: #DC4444;
+  --primary-dark: #880000;
+
+  /* Grays for night */
+  --gray-50: #2d2d2d;
+  --gray-100: #383838;
+  --gray-700: #1a1a1a;
+  --gray-800: #0a0000;
+
+  /* Status for night */
+  --success: #DC4444;
+  --warning: #DC4444;
+  --error: #DC4444;
+  --info: #DC4444;
 }
 
 /* Reset */
@@ -192,14 +242,14 @@ body {
    Header
    =================================== */
 .header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
   color: var(--white);
   padding: var(--space-4) var(--space-6);
   box-shadow: var(--shadow-lg);
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 3px solid var(--accent);
+  border-bottom: 3px solid var(--accent-yellow);
 }
 
 .header__container {
@@ -231,7 +281,7 @@ body {
 
 .header__subtitle {
   font-size: var(--text-xs);
-  color: var(--accent);
+  color: var(--accent-yellow);
   margin-top: var(--space-1);
   font-weight: var(--font-normal);
 }
@@ -328,9 +378,9 @@ body {
    Cards
    =================================== */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-left: 4px solid var(--accent);
+  background: var(--bg-card);
+  border: 1px solid var(--border-input);
+  border-left: 4px solid var(--accent-yellow);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-sm);
@@ -344,14 +394,14 @@ body {
 }
 
 .card__title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--accent-dark);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--accent-yellow);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  letter-spacing: 0.05em;
+  border-left: 3px solid var(--accent-yellow);
+  padding-left: var(--space-3);
+  margin-left: calc(-1 * var(--space-3));
 }
 
 .card__title-icon {
@@ -360,8 +410,10 @@ body {
 
 .card__subtitle {
   font-size: var(--text-sm);
-  color: var(--text-secondary);
-  margin-top: var(--space-1);
+  color: var(--text-muted);
+  margin-top: var(--space-2);
+  padding-left: var(--space-3);
+  margin-left: calc(-1 * var(--space-3));
 }
 
 /* ===================================
@@ -466,24 +518,24 @@ body {
   font-size: var(--text-base);
   font-family: var(--font-sans);
   color: var(--text-primary);
-  background: var(--bg-primary);
-  border: 1px solid var(--border-medium);
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .input:hover {
-  border-color: var(--btn-primary);
+  border-color: var(--accent-red);
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--btn-primary);
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+  border-color: var(--accent-red);
+  box-shadow: 0 0 0 3px rgba(220, 68, 68, 0.2);
 }
 
 .input::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-muted);
 }
 
 .textarea {
@@ -633,8 +685,8 @@ body {
 }
 
 .topic-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   position: relative;
@@ -642,18 +694,18 @@ body {
 }
 
 .topic-card:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-yellow);
   box-shadow: var(--shadow-md);
 }
 
 .topic-card.dragging {
   opacity: 0.5;
-  border: 2px dashed var(--btn-primary);
+  border: 2px dashed var(--accent-red);
 }
 
 .topic-card.drag-over {
-  border-color: var(--accent);
-  background: rgba(255, 215, 0, 0.1);
+  border-color: var(--accent-yellow);
+  background: rgba(234, 179, 8, 0.1);
 }
 
 .topic-header {
@@ -681,7 +733,7 @@ body {
 }
 
 .drag-handle:hover {
-  color: var(--btn-primary);
+  color: var(--accent-red);
 }
 
 .drag-handle:active {
@@ -691,7 +743,7 @@ body {
 .topic-label {
   font-weight: var(--font-bold);
   font-size: var(--text-base);
-  color: var(--accent-dark);
+  color: var(--accent-yellow);
 }
 
 .topic-actions {
@@ -721,9 +773,9 @@ body {
    Guided Prompts
    =================================== */
 .guided-prompts {
-  background: linear-gradient(135deg, rgba(74, 0, 0, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
-  border: 1px solid var(--border-light);
-  border-left: 3px solid var(--accent);
+  background: var(--bg-card);
+  border: 1px solid var(--border-input);
+  border-left: 3px solid var(--accent-yellow);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-4);
   overflow: hidden;
@@ -732,7 +784,7 @@ body {
 .guided-prompts summary {
   padding: var(--space-3) var(--space-4);
   cursor: pointer;
-  color: var(--accent-dark);
+  color: var(--accent-yellow);
   font-weight: var(--font-medium);
   font-size: var(--text-sm);
   display: flex;
@@ -742,11 +794,11 @@ body {
 }
 
 .guided-prompts summary:hover {
-  background: rgba(255, 215, 0, 0.1);
+  background: rgba(234, 179, 8, 0.1);
 }
 
 .guided-prompts summary::marker {
-  color: var(--accent-dark);
+  color: var(--accent-yellow);
 }
 
 .guided-prompts .prompt-list {
@@ -764,18 +816,18 @@ body {
    Actions Section
    =================================== */
 .actions-card {
-  background: var(--gray-800);
-  color: var(--white);
-  border: none;
-  border-left: 4px solid var(--accent);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-input);
+  border-left: 4px solid var(--accent-yellow);
 }
 
 .actions-card .card__header {
-  border-bottom-color: rgba(255, 255, 255, 0.2);
+  border-bottom-color: var(--border-input);
 }
 
 .actions-card .card__title {
-  color: var(--accent);
+  color: var(--accent-yellow);
 }
 
 .action-buttons {
@@ -795,13 +847,14 @@ body {
 }
 
 .action-buttons .btn--outline {
-  border-color: rgba(255, 255, 255, 0.4);
-  color: var(--white);
+  border-color: var(--border-input);
+  color: var(--text-primary);
 }
 
 .action-buttons .btn--outline:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--white);
+  background: var(--bg-input);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
 }
 
 /* ===================================
@@ -813,12 +866,12 @@ body {
   right: 0;
   width: 50%;
   height: 100vh;
-  background: var(--gray-700);
-  border-left: 3px solid var(--accent);
+  background: var(--bg-body);
+  border-left: 3px solid var(--accent-yellow);
   display: none;
   flex-direction: column;
   z-index: 1000;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
 }
 
 .live-preview-pane.show {
@@ -830,10 +883,10 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: var(--space-3) var(--space-4);
-  background: var(--primary-dark);
+  background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
   color: var(--white);
   font-weight: var(--font-semibold);
-  border-bottom: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent-yellow);
 }
 
 .preview-header span {
@@ -890,7 +943,7 @@ body {
   width: 40px;
   height: 40px;
   border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: var(--accent);
+  border-top-color: var(--accent-yellow);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -906,7 +959,7 @@ body {
     top: auto;
     bottom: 0;
     border-left: none;
-    border-top: 3px solid var(--accent);
+    border-top: 3px solid var(--accent-yellow);
   }
 }
 
