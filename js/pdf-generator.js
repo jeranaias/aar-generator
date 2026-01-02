@@ -168,15 +168,8 @@ const PDFGenerator = {
     pageBreak(LH * 4);
     pdf.text('1.', ML, y);
     pdf.setFont(fontName, 'bold');
-    pdf.text('IMPROVE.', ML + INDENT_SUB, y);
+    pdf.text('IMPROVE', ML + INDENT_SUB, y);
     pdf.setFont(fontName, 'normal');
-
-    // IMPROVE description text
-    const improveDescX = ML + INDENT_SUB + pdf.getTextWidth('IMPROVE.') + 4;
-    const improveDesc = 'This paragraph is used to discuss areas of the event that';
-    pdf.text(improveDesc, improveDescX, y);
-    y += LH;
-    pdf.text('occurred during any of the phases that needs to be improved.', ML, y);
     y += LH;
 
     // IMPROVE Topics
@@ -244,15 +237,8 @@ const PDFGenerator = {
     pageBreak(LH * 4);
     pdf.text('2.', ML, y);
     pdf.setFont(fontName, 'bold');
-    pdf.text('SUSTAIN.', ML + INDENT_SUB, y);
+    pdf.text('SUSTAIN', ML + INDENT_SUB, y);
     pdf.setFont(fontName, 'normal');
-
-    // SUSTAIN description text
-    const sustainDescX = ML + INDENT_SUB + pdf.getTextWidth('SUSTAIN.') + 4;
-    const sustainDesc = 'This paragraph is used to discuss areas of the event that';
-    pdf.text(sustainDesc, sustainDescX, y);
-    y += LH;
-    pdf.text('occurred during any of the phases that should be sustained because they were effective.', ML, y);
     y += LH;
 
     // SUSTAIN Topics

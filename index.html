@@ -51,6 +51,12 @@
           <h2 class="card__title">Unit Information</h2>
         </div>
         <div class="form-grid">
+          <!-- Unit Search -->
+          <div class="form-group form-group--full search-wrapper">
+            <label for="unitSearch" class="label">Search Units</label>
+            <input type="text" id="unitSearch" class="input" placeholder="Type to search USMC units..." autocomplete="off">
+            <div id="unitResults" class="search-results"></div>
+          </div>
           <div class="form-group form-group--full">
             <label for="unitName" class="label label--required">Unit Name</label>
             <input type="text" id="unitName" class="input" placeholder="e.g., 1ST BATTALION, 5TH MARINES" required>
@@ -63,13 +69,17 @@
             <label for="unitAddress2" class="label">Address Line 2</label>
             <input type="text" id="unitAddress2" class="input" placeholder="e.g., CAMP PENDLETON CA 92055">
           </div>
-          <div class="form-group">
+          <!-- SSIC with search -->
+          <div class="form-group search-wrapper">
             <label for="ssic" class="label">SSIC</label>
-            <input type="text" id="ssic" class="input" value="3504" placeholder="3504">
+            <input type="text" id="ssic" class="input" value="3504" placeholder="Search codes..." autocomplete="off">
+            <div id="ssicResults" class="search-results"></div>
           </div>
-          <div class="form-group">
+          <!-- Office Code with search -->
+          <div class="form-group search-wrapper">
             <label for="officeCode" class="label">Office Code</label>
-            <input type="text" id="officeCode" class="input" placeholder="e.g., S-3">
+            <input type="text" id="officeCode" class="input" placeholder="e.g., S-3" autocomplete="off">
+            <div id="officeCodeResults" class="search-results"></div>
           </div>
           <div class="form-group">
             <label for="documentDate" class="label label--required">Document Date</label>
@@ -359,6 +369,7 @@
   <script src="js/lib/theme.js"></script>
   <script src="js/lib/storage.js"></script>
   <script src="js/lib/date-utils.js"></script>
+  <script src="js/lib/data-manager.js"></script>
   <script src="js/aar-builder.js"></script>
   <script src="js/pdf-generator.js"></script>
   <script src="js/docx-generator.js"></script>

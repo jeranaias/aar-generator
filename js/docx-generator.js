@@ -124,8 +124,7 @@ const DOCXGenerator = {
       spacing: { after: 0, line: LINE_SPACING },
       children: [
         new TextRun({ text: '1.  ', font: FONT, size: FONT_SIZE }),
-        new TextRun({ text: 'IMPROVE.', font: FONT, size: FONT_SIZE, bold: true }),
-        new TextRun({ text: '  This paragraph is used to discuss areas of the event that occurred during any of the phases that needs to be improved.', font: FONT, size: FONT_SIZE })
+        new TextRun({ text: 'IMPROVE', font: FONT, size: FONT_SIZE, bold: true })
       ]
     }));
     children.push(createPara('')); // Blank line
@@ -145,8 +144,7 @@ const DOCXGenerator = {
       spacing: { after: 0, line: LINE_SPACING },
       children: [
         new TextRun({ text: '2.  ', font: FONT, size: FONT_SIZE }),
-        new TextRun({ text: 'SUSTAIN.', font: FONT, size: FONT_SIZE, bold: true }),
-        new TextRun({ text: '  This paragraph is used to discuss areas of the event that occurred during any of the phases that should be sustained because they were effective.', font: FONT, size: FONT_SIZE })
+        new TextRun({ text: 'SUSTAIN', font: FONT, size: FONT_SIZE, bold: true })
       ]
     }));
     children.push(createPara('')); // Blank line

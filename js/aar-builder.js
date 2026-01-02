@@ -44,8 +44,7 @@ const AARBuilder = {
     lines.push('');
 
     // IMPROVE Section
-    lines.push('1.  IMPROVE.  This paragraph is used to discuss areas of the event that occurred');
-    lines.push('during any of the phases that needs to be improved.');
+    lines.push('1.  IMPROVE');
     lines.push('');
 
     if (data.improveTopics && data.improveTopics.length > 0) {
@@ -59,8 +58,7 @@ const AARBuilder = {
     }
 
     // SUSTAIN Section
-    lines.push('2.  SUSTAIN.  This paragraph is used to discuss areas of the event that occurred');
-    lines.push('during any of the phases that should be sustained because they were effective.');
+    lines.push('2.  SUSTAIN');
     lines.push('');
 
     if (data.sustainTopics && data.sustainTopics.length > 0) {
