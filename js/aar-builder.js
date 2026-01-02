@@ -86,21 +86,12 @@ const AARBuilder = {
   },
 
   /**
-   * Build the From line
+   * Build the From line (organizational billet per naval letter format)
    * @param {Object} data - Form data
    * @returns {string} Formatted From line
    */
   buildFromLine(data) {
-    const parts = [];
-    if (data.fromRank) parts.push(data.fromRank);
-    if (data.fromName) parts.push(data.fromName);
-    if (data.fromBillet) {
-      if (parts.length > 0) {
-        return `${parts.join(' ')}, ${data.fromBillet}`;
-      }
-      return data.fromBillet;
-    }
-    return parts.join(' ') || '[FROM]';
+    return data.fromBillet?.trim() || '[FROM]';
   },
 
   /**
@@ -209,9 +200,7 @@ const AARBuilder = {
     // Required fields
     if (!data.unitName?.trim()) errors.push('Unit Name is required');
     if (!data.documentDate) errors.push('Document Date is required');
-    if (!data.fromRank) errors.push('From Rank is required');
-    if (!data.fromName?.trim()) errors.push('From Name is required');
-    if (!data.fromBillet?.trim()) errors.push('From Billet is required');
+    if (!data.fromBillet?.trim()) errors.push('From field is required');
     if (!data.toTitle?.trim()) errors.push('To field is required');
     if (!data.eventName?.trim()) errors.push('Event Name is required');
     if (!data.eventStartDate) errors.push('Event Start Date is required');

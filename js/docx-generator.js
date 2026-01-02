@@ -234,19 +234,10 @@ const DOCXGenerator = {
   },
 
   /**
-   * Build From line
+   * Build From line (organizational billet per naval letter format)
    */
   buildFromLine(data) {
-    const parts = [];
-    if (data.fromRank) parts.push(data.fromRank);
-    if (data.fromName) parts.push(data.fromName);
-    if (data.fromBillet) {
-      if (parts.length > 0) {
-        return `${parts.join(' ')}, ${data.fromBillet}`;
-      }
-      return data.fromBillet;
-    }
-    return parts.join(' ') || '[FROM]';
+    return data.fromBillet?.trim() || '[FROM]';
   },
 
   /**

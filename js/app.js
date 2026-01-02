@@ -412,8 +412,6 @@ const AARApp = {
       ssic: document.getElementById('ssic').value,
       officeCode: document.getElementById('officeCode').value,
       documentDate: document.getElementById('documentDate').value,
-      fromRank: document.getElementById('fromRank').value,
-      fromName: document.getElementById('fromName').value,
       fromBillet: document.getElementById('fromBillet').value,
       toTitle: document.getElementById('toTitle').value,
       eventName: document.getElementById('eventName').value,
@@ -544,7 +542,7 @@ const AARApp = {
   populateForm(data) {
     const fields = [
       'unitName', 'unitAddress1', 'unitAddress2', 'ssic', 'officeCode',
-      'documentDate', 'fromRank', 'fromName', 'fromBillet', 'toTitle',
+      'documentDate', 'fromBillet', 'toTitle',
       'eventName', 'eventStartDate', 'eventEndDate',
       'pocRank', 'pocName', 'pocPhone', 'pocEmail', 'signatureName'
     ];
@@ -605,8 +603,6 @@ const AARApp = {
       ssic: '3504',
       officeCode: 'S-3',
       documentDate: DateUtils.today(),
-      fromRank: 'Capt',
-      fromName: 'John A Smith',
       fromBillet: 'Training Officer',
       toTitle: 'Operations Officer',
       eventName: 'BATTALION LIVE FIRE EXERCISE',
